@@ -15,6 +15,7 @@ module.exports = {
       plugins: ['@typescript-eslint', 'jsdoc', 'import', 'header'],
       extends: [
         'plugin:@angular-eslint/recommended',
+        "prettier",
         'plugin:@angular-eslint/template/process-inline-templates',
         'plugin:prettier/recommended'
       ],
@@ -31,12 +32,11 @@ module.exports = {
           ],
           2
         ],
-        'jsdoc/newline-after-description': 1,
         '@angular-eslint/component-selector': [
           'error',
           {
             type: ['element', 'attribute'],
-            prefix: ['nz', 'test'],
+            prefix: ['nx', 'test'],
             style: 'kebab-case'
           }
         ],
@@ -50,7 +50,7 @@ module.exports = {
           'error',
           {
             type: 'attribute',
-            prefix: ['nz']
+            prefix: ['nx']
           }
         ],
         '@angular-eslint/no-attribute-decorator': 'error',
