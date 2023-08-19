@@ -1,15 +1,22 @@
 {
   "name": "ng-yike-design",
   "version": "0.0.0",
+  "author": "",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint": "eslint --cache . --ext .ts,.html",
+    "format": "prettier --config .prettierrc.js --list-different \\\"component/**/*{.ts}\\\"",
+    "lint:fix": "eslint --fix --cache . --ext .ts,.html",
+    "pre-commit": "tsc -p components/tsconfig.json --noEmit && lint-staged",
+    "prepare": "husky install"
   },
   "private": true,
   "dependencies": {
+    "@angular/cdk": "^16.1.0",
     "@angular/animations": "^16.1.0",
     "@angular/common": "^16.1.0",
     "@angular/compiler": "^16.1.0",
@@ -24,9 +31,23 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.1.5",
+    "@angular-eslint/builder": "^16.0.1",
+    "@angular-eslint/eslint-plugin": "^16.0.1",
+    "@angular-eslint/eslint-plugin-template": "^16.0.1",
+    "@angular-eslint/schematics": "^16.0.1",
+    "@angular-eslint/template-parser": "^16.0.1",
     "@angular/cli": "~16.1.5",
     "@angular/compiler-cli": "^16.1.0",
     "@types/jasmine": "~4.3.0",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "~8.3.0",
+    "eslint-plugin-header": "~3.1.1",
+    "eslint-plugin-import": "~2.25.3",
+    "eslint-plugin-jsdoc": "~46.3.0",
+    "eslint-plugin-prefer-arrow": "~1.2.2",
+    "eslint-plugin-prettier": "~4.0.0",
+    "husky": "^6.0.0",
+    "prettier": "~2.3.1",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -35,5 +56,10 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^16.0.0",
     "typescript": "~5.1.3"
+  },
+  "lint-staged": {
+    "(schematics|scripts|components)/**/!(tslint-rules|testing)/!(polyfills).{html,ts}": [
+      "eslint --fix"
+    ]
   }
 }
