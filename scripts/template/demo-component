@@ -1,0 +1,16 @@
+import { Component, QueryList, ViewChildren } from '@angular/core';
+import {CommonModule} from "@angular/common";
+{{imports}}
+
+@Component({
+  selector     : 'app-demo-{{demoName}}',
+  standalone: true,
+  template     : ``,
+  imports: [
+   CommonModule,
+   {{importComponentList}}
+  ],
+})
+export class {{componentName}} {
+
+}

@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"log"
+	"ng-yike-design/script/generate"
 	"os"
 	"path"
 	"path/filepath"
@@ -40,6 +41,7 @@ func runDocCommand(cmd *cobra.Command, _ []string) {
 	docDir, _ := cmd.Flags().GetString("doc-dir")
 	watch, _ := cmd.Flags().GetBool("watch")
 
+	generate.OutputComponent(docDir, componentsDir)
 	if watch {
 		watchDoc(cmd)
 	}
