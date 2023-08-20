@@ -7,10 +7,13 @@ import (
 	"io/ioutil"
 	"log"
 	"ng-yike-design/script/generate"
+	"ng-yike-design/script/util"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
+	"time"
 )
 
 var generateCommand = &cobra.Command{
@@ -40,8 +43,25 @@ func runDocCommand(cmd *cobra.Command, _ []string) {
 	componentsDir, _ := cmd.Flags().GetString("components-dir")
 	docDir, _ := cmd.Flags().GetString("doc-dir")
 	watch, _ := cmd.Flags().GetBool("watch")
+	sourceDir := path.Join("design-doc") // 源目录
+	destinationDir := path.Join(docDir)  // 目标目录
+
+	startTime := time.Now()
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+
+	go util.CopyDirectory(sourceDir, destinationDir, &wg)
+
+	wg.Wait()
+
+	elapsedTime := time.Since(startTime)
+	fmt.Printf("Total time taken: %s\n", elapsedTime)
 
 	generate.OutputComponent(docDir, componentsDir)
+	elapsedTime = time.Since(startTime)
+	fmt.Printf("Total time taken: %s\n", elapsedTime)
 	if watch {
 		watchDoc(cmd)
 	}

@@ -1,5 +1,5 @@
 import { Component, QueryList, ViewChildren } from '@angular/core';
-import {CommonModule} from "@angular/common";
+import { CommonModule } from "@angular/common";
 {{imports}}
 
 @Component({

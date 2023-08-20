@@ -3,7 +3,10 @@ package util
 import (
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
+	"path/filepath"
+	"sync"
 )
 
 func CopyFile(sourcePath, destinationPath string) error {
@@ -73,4 +76,56 @@ func WriteFile(filePath, content string) error {
 	}
 
 	return nil
+}
+
+func copyFile(sourcePath, destinationPath string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	sourceFile, err := os.Open(sourcePath)
+	if err != nil {
+		log.Println("Error opening source file:", err)
+		return
+	}
+	defer sourceFile.Close()
+
+	destinationFile, err := os.Create(destinationPath)
+	if err != nil {
+		log.Println("Error creating destination file:", err)
+		return
+	}
+	defer destinationFile.Close()
+
+	_, err = io.Copy(destinationFile, sourceFile)
+	if err != nil {
+		log.Println("Error copying file:", err)
+		return
+	}
+}
+
+func CopyDirectory(sourceDir, destinationDir string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	files, err := ioutil.ReadDir(sourceDir)
+	if err != nil {
+		log.Println("Error reading source directory:", err)
+		return
+	}
+
+	for _, file := range files {
+		sourcePath := filepath.Join(sourceDir, file.Name())
+		destinationPath := filepath.Join(destinationDir, file.Name())
+
+		if file.IsDir() {
+			err := os.MkdirAll(destinationPath, os.ModePerm)
+			if err != nil {
+				log.Println("Error creating destination directory:", err)
+				return
+			}
+			wg.Add(1)
+			go CopyDirectory(sourcePath, destinationPath, wg)
+		} else {
+			wg.Add(1)
+			go copyFile(sourcePath, destinationPath, wg)
+		}
+	}
 }
