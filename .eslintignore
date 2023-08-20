@@ -36,3 +36,4 @@ node_modules/
 
 # yarn v2
 .yarn
+scripts/design-doc/
