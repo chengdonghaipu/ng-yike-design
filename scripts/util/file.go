@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -128,4 +129,29 @@ func CopyDirectory(sourceDir, destinationDir string, wg *sync.WaitGroup) {
 			go copyFile(sourcePath, destinationPath, wg)
 		}
 	}
+}
+
+func RemoveFilesInDirParallel(dir string) error {
+	var wg sync.WaitGroup
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("failure accessing a path %q: %v", path, err)
+		}
+		if !info.IsDir() {
+			wg.Add(1)
+			go func(path string) {
+				defer wg.Done()
+				err := os.Remove(path)
+				if err != nil {
+					fmt.Printf("Failed to remove file: %s, error: %v\n", path, err)
+				} else {
+					//fmt.Printf("Successfully removed file: %s\n", path)
+				}
+			}(path)
+		}
+		return nil
+	})
+	wg.Wait()
+
+	return err
 }

@@ -13,7 +13,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 )
 
 var generateCommand = &cobra.Command{
@@ -39,6 +38,17 @@ var serviceCommand = &cobra.Command{
 	},
 }
 
+func clearDoc(destinationDir string) {
+	util.RemoveFilesInDirParallel(destinationDir)
+}
+
+func copyDoc(sourceDir, destinationDir string) {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go util.CopyDirectory(sourceDir, destinationDir, &wg)
+	wg.Wait()
+}
+
 func runDocCommand(cmd *cobra.Command, _ []string) {
 	componentsDir, _ := cmd.Flags().GetString("components-dir")
 	docDir, _ := cmd.Flags().GetString("doc-dir")
@@ -46,22 +56,21 @@ func runDocCommand(cmd *cobra.Command, _ []string) {
 	sourceDir := path.Join("design-doc") // 源目录
 	destinationDir := path.Join(docDir)  // 目标目录
 
-	startTime := time.Now()
+	util.MeasureTime("clearDoc", func() {
+		clearDoc(destinationDir)
+	})
+	//util.MeasureTime("clearDoc", func() {
+	//	util.RemoveFilesInDirParallel(destinationDir)
+	//})
 
-	var wg sync.WaitGroup
+	util.MeasureTime("copyDoc", func() {
+		copyDoc(sourceDir, destinationDir)
+	})
 
-	wg.Add(1)
+	util.MeasureTime("OutputComponent", func() {
+		generate.OutputComponent(docDir, componentsDir)
+	})
 
-	go util.CopyDirectory(sourceDir, destinationDir, &wg)
-
-	wg.Wait()
-
-	elapsedTime := time.Since(startTime)
-	fmt.Printf("Total time taken: %s\n", elapsedTime)
-
-	generate.OutputComponent(docDir, componentsDir)
-	elapsedTime = time.Since(startTime)
-	fmt.Printf("Total time taken: %s\n", elapsedTime)
 	if watch {
 		watchDoc(cmd)
 	}
