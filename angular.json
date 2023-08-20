@@ -87,12 +87,15 @@
             "inlineStyleLanguage": "less",
             "assets": [
               "projects/design-doc/src/favicon.ico",
-              "projects/design-doc/src/assets"
+              "projects/design-doc/src/assets",
+              "projects/design-doc/src/manifest.webmanifest"
             ],
             "styles": [
               "projects/design-doc/src/styles.less"
             ],
-            "scripts": []
+            "scripts": [],
+            "serviceWorker": true,
+            "ngswConfigPath": "projects/design-doc/ngsw-config.json"
           },
           "configurations": {
             "production": {
@@ -150,7 +153,8 @@
             "inlineStyleLanguage": "less",
             "assets": [
               "projects/design-doc/src/favicon.ico",
-              "projects/design-doc/src/assets"
+              "projects/design-doc/src/assets",
+              "projects/design-doc/src/manifest.webmanifest"
             ],
             "styles": [
               "projects/design-doc/src/styles.less"
