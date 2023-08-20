@@ -11,7 +11,7 @@
     "lint": "eslint --cache . --ext .ts,.html",
     "format": "prettier --config .prettierrc.js --list-different \"components/**/*.ts\"",
     "lint:fix": "eslint --fix --cache . --ext .ts,.html",
-    "pre-commit": "tsc -p components/tsconfig.json --noEmit && lint-staged",
+    "pre-commit": "tsc -p projects/components/tsconfig.json --noEmit && lint-staged",
     "prepare": "husky install"
   },
   "private": true,
