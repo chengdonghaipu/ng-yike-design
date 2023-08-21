@@ -3,6 +3,7 @@ module ng-yike-design/script
 go 1.18
 
 require (
+	github.com/dlclark/regexp2 v1.10.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/gookit/color v1.5.4

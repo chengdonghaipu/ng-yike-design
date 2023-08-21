@@ -14,12 +14,18 @@ import (
 
 type Component struct {
   // 组件名称 比如: button
-  Name         string
-  OutputDir    string
-  DocDir       string
+  Name      string
+  OutputDir string
+  DocDir    string
+  // button
   ComponentDir string
-  TemplatePath string
-  DemoDocument []*util.Document
+  // button/demo
+  DemoDir string
+  // 组件文档目录 button/doc
+  ComponentDocDir   string
+  TemplatePath      string
+  DemoDocument      []*util.Document
+  ComponentDocument []*util.ApiDocument
 }
 
 func NewComponent(name, docDir, componentDir string) *Component {
@@ -32,11 +38,13 @@ func NewComponent(name, docDir, componentDir string) *Component {
   }
 
   return &Component{
-    Name:         name,
-    DocDir:       docDir,
-    OutputDir:    outputDir,
-    ComponentDir: componentDir,
-    TemplatePath: path.Join("template", "demo-component"),
+    Name:            name,
+    DocDir:          docDir,
+    OutputDir:       outputDir,
+    ComponentDir:    componentDir,
+    DemoDir:         path.Join(componentDir, "demo"),
+    ComponentDocDir: path.Join(componentDir, "doc"),
+    TemplatePath:    path.Join("template", "demo-component"),
   }
 }
 
@@ -47,7 +55,7 @@ type DemoMeta struct {
 }
 
 func (receiver *Component) OutputComponents() error {
-  componentDir := receiver.ComponentDir
+  componentDir := receiver.DemoDir
   var demoMetas []*DemoMeta
   files, err := ioutil.ReadDir(componentDir)
 
@@ -86,6 +94,9 @@ func (receiver *Component) OutputComponents() error {
 
   wg.Add(1)
 
+  go receiver.resolveApiMd(&wg)
+
+  wg.Add(1)
   go func() {
     defer wg.Done()
     err := receiver.OutputTemplate(demoMetas)
@@ -107,6 +118,39 @@ func (receiver *Component) OutputComponent(demoDir, filename string) {
   }
 
   receiver.resolveMd(demoDir, filename)
+}
+
+func (receiver *Component) resolveApiMd(wg *sync.WaitGroup) {
+  defer wg.Done()
+  componentDocDir := receiver.ComponentDocDir
+
+  dirs, err := ioutil.ReadDir(componentDocDir)
+
+  if err != nil {
+    log.Println("Error:", err)
+    return
+  }
+
+  for _, file := range dirs {
+    if file.IsDir() {
+      continue
+    }
+
+    filename := file.Name()
+
+    if !strings.HasSuffix(filename, ".md") {
+      continue
+    }
+
+    mdFilePath := path.Join(componentDocDir, filename)
+    document, err := util.ParseApiDocument(mdFilePath)
+
+    if err != nil {
+      log.Fatal("Error parsing markdown:", err)
+    }
+
+    receiver.ComponentDocument = append(receiver.ComponentDocument, document)
+  }
 }
 
 func (receiver *Component) resolveMd(demoDir, filename string) {
@@ -210,7 +254,7 @@ func OutputComponent(docDir, componentDir string) error {
     go func(demoDir, componentName string) {
       go wg.Done()
 
-      err := NewComponent(componentName, docDir, demoDir).OutputComponents()
+      err := NewComponent(componentName, docDir, path.Join(componentDir, componentName)).OutputComponents()
       if err != nil {
         fmt.Println("err: ", err)
         return
