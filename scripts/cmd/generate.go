@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"log"
+	"ng-yike-design/script/flows"
 	"ng-yike-design/script/generate"
 	"ng-yike-design/script/util"
 	"os"
@@ -57,20 +58,32 @@ func runDocCommand(cmd *cobra.Command, _ []string) {
 	sourceDir := path.Join("design-doc") // 源目录
 	destinationDir := path.Join(docDir)  // 目标目录
 
-	util.MeasureTime("clearDoc", func() {
+	clearDesignDocTask := flows.NewTask("清除 design-doc", func() error {
 		clearDoc(destinationDir)
+		return nil
 	})
 
-	util.MeasureTime("copyDoc", func() {
+	copyDesignDocTask := flows.NewTask("复制 design-doc", func() error {
 		copyDoc(sourceDir, destinationDir)
+		return nil
 	})
 
-	go util.MeasureTime("generate globalDocs", func() {
-		generate.NewGlobalDocs(docsDir).Generate()
+	collectGlobalDocsTask := flows.NewTask("收集全局文档信息", func() error {
+		return generate.NewGlobalDocs(docsDir).Collect()
 	})
 
-	util.MeasureTime("OutputComponent", func() {
-		generate.OutputComponent(docDir, componentsDir)
+	generateComponentDocsTask := flows.NewTask("生成组件文档", func() error {
+		return generate.CompileComponentDoc(docDir, componentsDir)
+	})
+
+	flows.SerialTask([]*flows.Task{
+		clearDesignDocTask,
+		copyDesignDocTask,
+	})
+
+	flows.ParallelTask([]*flows.Task{
+		collectGlobalDocsTask,
+		generateComponentDocsTask,
 	})
 
 	if watch {

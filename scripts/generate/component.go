@@ -54,7 +54,7 @@ type DemoMeta struct {
 	FilePath string
 }
 
-func (receiver *Component) OutputComponents() error {
+func (receiver *Component) GenerateComponents() error {
 	componentDir := receiver.DemoDir
 	var demoMetas []*DemoMeta
 	files, err := ioutil.ReadDir(componentDir)
@@ -223,7 +223,7 @@ func (receiver *Component) OutputTemplate(demoMetas []*DemoMeta) error {
 	return nil
 }
 
-func OutputComponent(docDir, componentDir string) error {
+func CompileComponentDoc(docDir, componentDir string) error {
 	dirs, err := ioutil.ReadDir(componentDir)
 
 	if err != nil {
@@ -247,7 +247,7 @@ func OutputComponent(docDir, componentDir string) error {
 		go func(demoDir, componentName string) {
 			go wg.Done()
 
-			err := NewComponent(componentName, docDir, path.Join(componentDir, componentName)).OutputComponents()
+			err := NewComponent(componentName, docDir, path.Join(componentDir, componentName)).GenerateComponents()
 			if err != nil {
 				fmt.Println("err: ", err)
 				return

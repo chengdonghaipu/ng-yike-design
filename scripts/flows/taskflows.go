@@ -2,6 +2,7 @@ package flows
 
 import (
 	"fmt"
+	"github.com/gookit/color"
 	"sync"
 	"time"
 )
@@ -19,7 +20,7 @@ type Task struct {
 
 func printExecutionTime(task *Task) {
 	executionTime := task.EndTime.Sub(task.StartTime).Milliseconds()
-	fmt.Printf("[%s] completed Execution time: %d ms\n", task.Name, executionTime)
+	color.Green.Println(fmt.Sprintf("[%s] completed Execution time: %d ms", task.Name, executionTime))
 }
 
 func NewTask(name string, work func() error) *Task {
@@ -45,7 +46,7 @@ func (t *Task) Run() error {
 	defer t.mu.Unlock()
 
 	t.StartTime = time.Now()
-	fmt.Printf("[%s] Task started\n", t.Name)
+	color.Green.Println(fmt.Sprintf("[%s] Task started", t.Name))
 	err := t.Work()
 	if err != nil {
 		return err

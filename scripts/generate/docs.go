@@ -1,80 +1,84 @@
 package generate
 
 import (
-  "io/ioutil"
-  "log"
-  "ng-yike-design/script/util"
-  "path"
-  "strings"
-  "sync"
+	"io/ioutil"
+	"log"
+	"ng-yike-design/script/util"
+	"path"
+	"strings"
+	"sync"
 )
 
 type GlobalDocs struct {
-  RootDir   string
-  Documents []*util.GlobalDocument
+	RootDir   string
+	Documents []*util.GlobalDocument
 }
 
 func NewGlobalDocs(rootDir string) *GlobalDocs {
-  return &GlobalDocs{RootDir: rootDir}
+	return &GlobalDocs{RootDir: rootDir}
 }
 
 func (receiver *GlobalDocs) Generate() error {
-  var wg sync.WaitGroup
-  dirs, err := ioutil.ReadDir(receiver.RootDir)
+	return nil
+}
 
-  if err != nil {
-    log.Println("Error:", err)
-    return err
-  }
+func (receiver *GlobalDocs) Collect() error {
+	var wg sync.WaitGroup
+	dirs, err := ioutil.ReadDir(receiver.RootDir)
 
-  for _, dir := range dirs {
-    if !dir.IsDir() {
-      continue
-    }
-    dirName := dir.Name()
-    langDir := path.Join(receiver.RootDir, dirName)
+	if err != nil {
+		log.Println("Error:", err)
+		return err
+	}
 
-    wg.Add(1)
-    go func(langDir string) {
-      receiver.resolveMd(langDir, &wg)
-    }(langDir)
-  }
+	for _, dir := range dirs {
+		if !dir.IsDir() {
+			continue
+		}
+		dirName := dir.Name()
+		langDir := path.Join(receiver.RootDir, dirName)
 
-  wg.Wait()
+		wg.Add(1)
+		go func(langDir string) {
+			receiver.resolveMd(langDir, &wg)
+		}(langDir)
+	}
 
-  return nil
+	wg.Wait()
+
+	return nil
 }
 
 func (receiver *GlobalDocs) resolveMd(langDir string, wg *sync.WaitGroup) {
-  defer wg.Done()
+	defer wg.Done()
 
-  files, err := ioutil.ReadDir(langDir)
+	files, err := ioutil.ReadDir(langDir)
 
-  if err != nil {
-    log.Println("Error:", err)
-    return
-  }
+	if err != nil {
+		log.Println("Error:", err)
+		return
+	}
 
-  for _, file := range files {
-    if file.IsDir() {
-      continue
-    }
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
 
-    filename := file.Name()
+		filename := file.Name()
 
-    if !strings.HasSuffix(filename, ".md") {
-      continue
-    }
+		if !strings.HasSuffix(filename, ".md") {
+			continue
+		}
 
-    mdPath := path.Join(langDir, filename)
+		mdPath := path.Join(langDir, filename)
 
-    document, err := util.ParseGlobalDocument(mdPath)
+		document, err := util.ParseGlobalDocument(mdPath)
 
-    if err != nil {
-      log.Println("Error:", err)
-      return
-    }
+		if err != nil {
+			log.Println("Error:", err)
+			return
+		}
 
-    receiver.Documents = append(receiver.Documents, document)
-  }
+		receiver.Documents = append(receiver.Documents, document)
+	}
 }
