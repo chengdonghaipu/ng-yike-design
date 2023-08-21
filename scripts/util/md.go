@@ -5,6 +5,7 @@ import (
 	"github.com/go-yaml/yaml"
 	"github.com/russross/blackfriday/v2"
 	"io/ioutil"
+	"path"
 	"regexp"
 	"strings"
 )
@@ -164,4 +165,53 @@ func getSectionContent(content, section string) string {
 func convertToHTML(markdown string) string {
 	htmlOutput := blackfriday.Run([]byte(markdown))
 	return string(htmlOutput)
+}
+
+type GlobalDocMetadata struct {
+	Order int    `yaml:"order"`
+	Title string `yaml:"title"`
+}
+
+type GlobalDocument struct {
+	Metadata GlobalDocMetadata
+	Language string
+	Content  string
+}
+
+func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
+	mdContent, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	dirPath := path.Dir(filePath)
+
+	_, parentDirName := path.Split(dirPath)
+
+	re := regexp.MustCompile(`---\n([\s\S]*?)\n---`)
+	match := re.FindStringSubmatch(string(mdContent))
+	if len(match) < 2 {
+		return nil, fmt.Errorf("YAML section not found")
+	}
+
+	yamlContent := match[1]
+	markdownContent := string(mdContent)[len(yamlContent)+8:]
+
+	var metadata GlobalDocMetadata
+	if err := yaml.Unmarshal([]byte(yamlContent), &metadata); err != nil {
+		return nil, fmt.Errorf("error parsing YAML: %w", err)
+	}
+
+	htmlOutput := blackfriday.Run([]byte(markdownContent))
+	htmlString := string(htmlOutput)
+
+	var globalDoc GlobalDocument
+
+	globalDoc.Metadata = metadata
+	// Detecting language
+	globalDoc.Language = parentDirName
+
+	globalDoc.Content = htmlString
+
+	return &globalDoc, nil
 }

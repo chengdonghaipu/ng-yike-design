@@ -52,6 +52,7 @@ func copyDoc(sourceDir, destinationDir string) {
 func runDocCommand(cmd *cobra.Command, _ []string) {
 	componentsDir, _ := cmd.Flags().GetString("components-dir")
 	docDir, _ := cmd.Flags().GetString("doc-dir")
+	docsDir, _ := cmd.Flags().GetString("docs-dir")
 	watch, _ := cmd.Flags().GetBool("watch")
 	sourceDir := path.Join("design-doc") // 源目录
 	destinationDir := path.Join(docDir)  // 目标目录
@@ -59,12 +60,13 @@ func runDocCommand(cmd *cobra.Command, _ []string) {
 	util.MeasureTime("clearDoc", func() {
 		clearDoc(destinationDir)
 	})
-	//util.MeasureTime("clearDoc", func() {
-	//	util.RemoveFilesInDirParallel(destinationDir)
-	//})
 
 	util.MeasureTime("copyDoc", func() {
 		copyDoc(sourceDir, destinationDir)
+	})
+
+	go util.MeasureTime("generate globalDocs", func() {
+		generate.NewGlobalDocs(docsDir).Generate()
 	})
 
 	util.MeasureTime("OutputComponent", func() {
@@ -167,6 +169,7 @@ func initDocCommand() {
 
 	docCommand.Flags().String("components-dir", path.Join(wd, "projects", "components"), "components 绝对路径")
 	docCommand.Flags().String("doc-dir", path.Join(wd, "projects", "design-doc"), "design-doc 绝对路径")
+	docCommand.Flags().String("docs-dir", path.Join(wd, "docs"), "docs 绝对路径")
 	docCommand.Flags().Bool("watch", true, "监听文件变化")
 }
 
