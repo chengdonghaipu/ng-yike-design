@@ -39,15 +39,77 @@ var serviceCommand = &cobra.Command{
 	},
 }
 
-func clearDoc(destinationDir string) {
-	util.RemoveFilesInDirParallel(destinationDir)
+type CompileDocTask struct {
+	ComponentsDir            string
+	DocDir                   string
+	DocsDir                  string
+	SourceDocDir             string
+	ClearDesignDocTask       *flows.Task
+	CopyDesignDocTask        *flows.Task
+	CollectGlobalDocsTask    *flows.Task
+	CollectComponentDocsTask *flows.Task
+	GlobalDocs               *generate.GlobalDocs
+	Components               []*generate.Component
 }
 
-func copyDoc(sourceDir, destinationDir string) {
+func NewCompileDocTask(componentsDir string, docDir string, docsDir string, sourceDocDir string) *CompileDocTask {
+	task := &CompileDocTask{
+		ComponentsDir: componentsDir,
+		DocDir:        docDir,
+		DocsDir:       docsDir,
+		SourceDocDir:  sourceDocDir,
+	}
+
+	task.registrationTask()
+
+	return task
+}
+
+func (receiver *CompileDocTask) clearTaskHandler() error {
+	return util.RemoveFilesInDirParallel(receiver.DocDir)
+}
+
+func (receiver *CompileDocTask) collectGlobalDocsTaskHandler() error {
+	receiver.GlobalDocs = generate.NewGlobalDocs(receiver.DocsDir)
+	return receiver.GlobalDocs.Collect()
+}
+
+func (receiver *CompileDocTask) collectComponentDocsTaskHandler() error {
+	err := generate.CollectComponentDoc(receiver.DocDir, receiver.ComponentsDir, &receiver.Components)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (receiver *CompileDocTask) copyDocProjectTaskHandler() error {
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go util.CopyDirectory(sourceDir, destinationDir, &wg)
+	go util.CopyDirectory(receiver.SourceDocDir, receiver.DocDir, &wg)
 	wg.Wait()
+
+	return nil
+}
+
+func (receiver *CompileDocTask) registrationTask() {
+	receiver.ClearDesignDocTask = flows.NewTask("清除 design-doc", receiver.clearTaskHandler)
+	receiver.CopyDesignDocTask = flows.NewTask("复制 design-doc", receiver.copyDocProjectTaskHandler)
+	receiver.CopyDesignDocTask.SetDependency(receiver.ClearDesignDocTask)
+	receiver.CollectGlobalDocsTask = flows.NewTask("收集全局文档信息", receiver.collectGlobalDocsTaskHandler)
+	receiver.CollectComponentDocsTask = flows.NewTask("收集组件文档信息", receiver.collectComponentDocsTaskHandler)
+}
+
+func (receiver *CompileDocTask) CompileTask() {
+	flows.ParallelTask([]*flows.Task{
+		receiver.ClearDesignDocTask,
+		receiver.CopyDesignDocTask,
+		receiver.CollectComponentDocsTask,
+		receiver.CollectGlobalDocsTask,
+	})
+}
+
+func (receiver *CompileDocTask) GenerateTask() {
+
 }
 
 func runDocCommand(cmd *cobra.Command, _ []string) {
@@ -56,43 +118,14 @@ func runDocCommand(cmd *cobra.Command, _ []string) {
 	docsDir, _ := cmd.Flags().GetString("docs-dir")
 	watch, _ := cmd.Flags().GetBool("watch")
 	sourceDir := path.Join("design-doc") // 源目录
-	destinationDir := path.Join(docDir)  // 目标目录
 
-	clearDesignDocTask := flows.NewTask("清除 design-doc", func() error {
-		clearDoc(destinationDir)
-		return nil
-	})
+	compileDocTask := NewCompileDocTask(componentsDir, docDir, docsDir, sourceDir)
 
-	copyDesignDocTask := flows.NewTask("复制 design-doc", func() error {
-		copyDoc(sourceDir, destinationDir)
-		return nil
-	})
-
-	collectGlobalDocsTask := flows.NewTask("收集全局文档信息", func() error {
-		return generate.NewGlobalDocs(docsDir).Collect()
-	})
-
-	generateComponentDocsTask := flows.NewTask("生成组件文档", func() error {
-		return generate.CompileComponentDoc(docDir, componentsDir)
-	})
-
-	flows.SerialTask([]*flows.Task{
-		clearDesignDocTask,
-		copyDesignDocTask,
-	})
-
-	flows.ParallelTask([]*flows.Task{
-		collectGlobalDocsTask,
-		generateComponentDocsTask,
-	})
+	compileDocTask.CompileTask()
 
 	if watch {
 		watchDoc(cmd)
 	}
-
-	fmt.Println(componentsDir)
-	fmt.Println(docDir)
-	fmt.Println(watch)
 }
 
 func watchDirectory(watcher *fsnotify.Watcher, dirPath string) error {

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"sync"
 )
@@ -26,6 +27,7 @@ type Component struct {
 	TemplatePath      string
 	DemoDocument      []*util.Document
 	ComponentDocument []*util.ApiDocument
+	DemoMetas         []*DemoMeta
 }
 
 func NewComponent(name, docDir, componentDir string) *Component {
@@ -55,8 +57,11 @@ type DemoMeta struct {
 }
 
 func (receiver *Component) GenerateComponents() error {
+	return nil
+}
+
+func (receiver *Component) CollectComponents() error {
 	componentDir := receiver.DemoDir
-	var demoMetas []*DemoMeta
 	files, err := ioutil.ReadDir(componentDir)
 
 	if err != nil {
@@ -82,13 +87,13 @@ func (receiver *Component) GenerateComponents() error {
 			FilePath: filepath.Join(componentDir, filename),
 		}
 
-		demoMetas = append(demoMetas, demoMeta)
+		receiver.DemoMetas = append(receiver.DemoMetas, demoMeta)
 
 		wg.Add(1)
 
 		go func(filePath string) {
 			defer wg.Done()
-			receiver.OutputComponent(componentDir, filename)
+			receiver.CollectComponent(componentDir, filename)
 		}(demoMeta.FilePath)
 	}
 
@@ -96,14 +101,14 @@ func (receiver *Component) GenerateComponents() error {
 
 	go receiver.resolveApiMd(&wg)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := receiver.OutputTemplate(demoMetas)
-		if err != nil {
-			return
-		}
-	}()
+	//wg.Add(1)
+	//go func() {
+	//  defer wg.Done()
+	//  err := receiver.OutputTemplate(receiver.DemoMetas)
+	//  if err != nil {
+	//    return
+	//  }
+	//}()
 
 	wg.Wait()
 
@@ -111,11 +116,14 @@ func (receiver *Component) GenerateComponents() error {
 }
 
 func (receiver *Component) OutputComponent(demoDir, filename string) {
-	err := receiver.CopyComponent(demoDir, filename)
-	if err != nil {
-		fmt.Println("err: ", err)
-		return
-	}
+
+}
+func (receiver *Component) CollectComponent(demoDir, filename string) {
+	//err := receiver.CopyComponent(demoDir, filename)
+	//if err != nil {
+	//  fmt.Println("err: ", err)
+	//  return
+	//}
 
 	receiver.resolveMd(demoDir, filename)
 }
@@ -220,6 +228,57 @@ func (receiver *Component) OutputTemplate(demoMetas []*DemoMeta) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func CollectComponentDoc(docDir, componentDir string, out interface{}) error {
+	// 使用反射设置字段的值
+	val := reflect.ValueOf(out)
+
+	if val.Kind() == reflect.Ptr && val.Elem().Kind() == reflect.Slice {
+		dirs, err := ioutil.ReadDir(componentDir)
+
+		if err != nil {
+			log.Println("Error:", err)
+			return err
+		}
+
+		var components []*Component
+
+		var wg sync.WaitGroup
+		var mu sync.Mutex
+
+		for _, file := range dirs {
+			if !file.IsDir() {
+				continue
+			}
+
+			demoDir := path.Join(componentDir, file.Name(), "demo")
+
+			if !util.DirectoryExists(demoDir) {
+				continue
+			}
+
+			wg.Add(1)
+			go func(demoDir, componentName string) {
+				defer wg.Done()
+				component := NewComponent(componentName, docDir, path.Join(componentDir, componentName))
+				mu.Lock()
+				components = append(components, component)
+				mu.Unlock()
+				err := component.CollectComponents()
+				if err != nil {
+					fmt.Println("err: ", err)
+					return
+				}
+			}(demoDir, file.Name())
+		}
+
+		wg.Wait()
+		val.Elem().Set(reflect.ValueOf(components))
+		return nil
+	}
+
 	return nil
 }
 
