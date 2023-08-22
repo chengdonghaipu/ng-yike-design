@@ -8,14 +8,14 @@ import (
 )
 
 type Task struct {
-	Name       string
-	Work       func() error
-	Dependency *Task
-	mu         sync.Mutex
-	cond       *sync.Cond
-	done       bool
-	StartTime  time.Time
-	EndTime    time.Time
+	Name         string
+	Work         func() error
+	Dependencies []*Task
+	mu           sync.Mutex
+	cond         *sync.Cond
+	done         bool
+	StartTime    time.Time
+	EndTime      time.Time
 }
 
 func printExecutionTime(task *Task) {
@@ -25,22 +25,27 @@ func printExecutionTime(task *Task) {
 
 func NewTask(name string, work func() error) *Task {
 	task := &Task{
-		Name: name,
-		Work: work,
-		done: false,
+		Name:         name,
+		Work:         work,
+		done:         false,
+		Dependencies: make([]*Task, 0),
 	}
 	task.cond = sync.NewCond(&task.mu)
 	return task
 }
 
 func (t *Task) SetDependency(dependency *Task) {
-	t.Dependency = dependency
+	t.Dependencies = append(t.Dependencies, dependency)
+}
+
+func (t *Task) WaitForDependencies() {
+	for _, dep := range t.Dependencies {
+		dep.WaitForCompletion()
+	}
 }
 
 func (t *Task) Run() error {
-	if t.Dependency != nil {
-		t.Dependency.WaitForCompletion()
-	}
+	t.WaitForDependencies()
 
 	t.mu.Lock()
 	defer t.mu.Unlock()
