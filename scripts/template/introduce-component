@@ -1,11 +1,11 @@
-import { Component, QueryList, ViewChildren } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from "@angular/common";
 {{imports}}
 
 @Component({
   selector     : 'app-doc-{{docName}}-{{lang}}',
   standalone: true,
-  template     : ``,
+  template     : `{{template}}`,
   imports: [
    CommonModule,
    {{importComponentList}}

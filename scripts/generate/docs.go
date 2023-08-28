@@ -7,6 +7,7 @@ import (
 	"ng-yike-design/script/util"
 	"path"
 	"reflect"
+	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -25,6 +26,16 @@ func NewGlobalDocs(rootDir string, docDir string) *GlobalDocs {
 type RouteConfig struct {
 	RouteList []string
 	Imports   []string
+}
+
+func angularNonBindAble(content string) string {
+	reOpenBrace := regexp.MustCompile(`{`)
+	reCloseBrace := regexp.MustCompile(`}`)
+
+	content = reOpenBrace.ReplaceAllString(content, "&#123;")
+	content = reCloseBrace.ReplaceAllString(content, "&#125;")
+
+	return content
 }
 
 func (receiver *GlobalDocs) generateComponent(document *util.GlobalDocument, out interface{}) error {
@@ -48,6 +59,7 @@ func (receiver *GlobalDocs) generateComponent(document *util.GlobalDocument, out
 	componentTemplate = strings.Replace(componentTemplate, "{{imports}}", strings.Join(importDepComponentList, "\n"), 1)
 	componentTemplate = strings.Replace(componentTemplate, "{{docName}}", document.FileName, 1)
 	componentTemplate = strings.Replace(componentTemplate, "{{lang}}", document.LangSimple, 1)
+	componentTemplate = strings.Replace(componentTemplate, "{{template}}", angularNonBindAble(document.Content), 1)
 	componentTemplate = strings.Replace(componentTemplate, "{{importComponentList}}", strings.Join(make([]string, 0), ",\n   "), 1)
 	componentTemplate = strings.Replace(componentTemplate, "{{componentName}}", componentName, 1)
 
