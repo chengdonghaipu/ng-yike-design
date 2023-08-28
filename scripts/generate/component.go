@@ -9,6 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strings"
 	"sync"
 )
@@ -23,11 +24,11 @@ type Component struct {
 	// button/demo
 	DemoDir string
 	// 组件文档目录 button/doc
-	ComponentDocDir   string
-	TemplatePath      string
-	DemoDocument      []*util.Document
-	ComponentDocument []*util.ApiDocument
-	DemoMetas         []*DemoMeta
+	ComponentDocDir    string
+	TemplatePath       string
+	DemoDocuments      []*util.Document
+	ComponentDocuments []*util.ApiDocument
+	DemoMetas          []*DemoMeta
 }
 
 func NewComponent(name, docDir, componentDir string) *Component {
@@ -101,15 +102,6 @@ func (receiver *Component) CollectComponents() error {
 
 	go receiver.resolveApiMd(&wg)
 
-	//wg.Add(1)
-	//go func() {
-	//  defer wg.Done()
-	//  err := receiver.OutputTemplate(receiver.DemoMetas)
-	//  if err != nil {
-	//    return
-	//  }
-	//}()
-
 	wg.Wait()
 
 	return nil
@@ -126,6 +118,10 @@ func (receiver *Component) CollectComponent(demoDir, filename string) {
 	//}
 
 	receiver.resolveMd(demoDir, filename)
+
+	sort.Slice(receiver.DemoDocuments, func(i, j int) bool {
+		return receiver.DemoDocuments[i].Metadata.Order < receiver.DemoDocuments[j].Metadata.Order
+	})
 }
 
 func (receiver *Component) resolveApiMd(wg *sync.WaitGroup) {
@@ -157,7 +153,7 @@ func (receiver *Component) resolveApiMd(wg *sync.WaitGroup) {
 			log.Fatal("Error parsing markdown:", err)
 		}
 
-		receiver.ComponentDocument = append(receiver.ComponentDocument, document)
+		receiver.ComponentDocuments = append(receiver.ComponentDocuments, document)
 	}
 }
 
@@ -173,7 +169,7 @@ func (receiver *Component) resolveMd(demoDir, filename string) {
 		log.Fatal("Error parsing markdown:", err)
 	}
 
-	receiver.DemoDocument = append(receiver.DemoDocument, document)
+	receiver.DemoDocuments = append(receiver.DemoDocuments, document)
 }
 
 func (receiver *Component) CopyComponent(demoDir, filename string) error {

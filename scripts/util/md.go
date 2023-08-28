@@ -6,6 +6,7 @@ import (
 	"github.com/russross/blackfriday/v2"
 	"io/ioutil"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -173,9 +174,12 @@ type GlobalDocMetadata struct {
 }
 
 type GlobalDocument struct {
-	Metadata GlobalDocMetadata
-	Language string
-	Content  string
+	Metadata   GlobalDocMetadata
+	Language   string
+	Content    string
+	FileName   string
+	LangSimple string
+	RoutePath  string
 }
 
 func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
@@ -197,6 +201,12 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 	yamlContent := match[1]
 	markdownContent := string(mdContent)[len(yamlContent)+8:]
 
+	// 获取文件名（包括扩展名）
+	fileNameWithExtension := filepath.Base(filePath)
+
+	// 去除扩展名
+	fileName := strings.TrimSuffix(fileNameWithExtension, filepath.Ext(fileNameWithExtension))
+
 	var metadata GlobalDocMetadata
 	if err := yaml.Unmarshal([]byte(yamlContent), &metadata); err != nil {
 		return nil, fmt.Errorf("error parsing YAML: %w", err)
@@ -212,6 +222,9 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 	globalDoc.Language = parentDirName
 
 	globalDoc.Content = htmlString
+	globalDoc.FileName = fileName
+	globalDoc.LangSimple = strings.Split(parentDirName, "-")[0]
+	globalDoc.RoutePath = fmt.Sprintf("%s/%s", fileName, globalDoc.LangSimple)
 
 	return &globalDoc, nil
 }
