@@ -28,6 +28,28 @@ type RouteConfig struct {
 	Imports   []string
 }
 
+func wrapperDocs(title, content string) string {
+	return fmt.Sprintf(
+		"<article class=\"markdown\">%s\n  <section class=\"markdown\" ngNonBindable>%s</section>\n  </article>",
+		title,
+		content)
+}
+
+func generateTitle(meta util.GlobalDocMetadata) string {
+	docTitleTemplatePath := path.Join("template", "doc-title")
+	docTitleTemplate, err := util.ReadFile(docTitleTemplatePath)
+
+	if err != nil {
+		return ""
+	}
+
+	docTitleTemplate = strings.Replace(docTitleTemplate, "{{title}}", meta.Title, 1)
+	docTitleTemplate = strings.Replace(docTitleTemplate, "{{subtitle}}", meta.Subtitle, 1)
+	docTitleTemplate = strings.Replace(docTitleTemplate, "{{widget}}", meta.Widget, 1)
+
+	return docTitleTemplate
+}
+
 func angularNonBindAble(content string) string {
 	reOpenBrace := regexp.MustCompile(`{`)
 	reCloseBrace := regexp.MustCompile(`}`)
@@ -59,7 +81,12 @@ func (receiver *GlobalDocs) generateComponent(document *util.GlobalDocument, out
 	componentTemplate = strings.Replace(componentTemplate, "{{imports}}", strings.Join(importDepComponentList, "\n"), 1)
 	componentTemplate = strings.Replace(componentTemplate, "{{docName}}", document.FileName, 1)
 	componentTemplate = strings.Replace(componentTemplate, "{{lang}}", document.LangSimple, 1)
-	componentTemplate = strings.Replace(componentTemplate, "{{template}}", angularNonBindAble(document.Content), 1)
+	componentTemplate = strings.Replace(
+		componentTemplate,
+		"{{template}}",
+		wrapperDocs(generateTitle(document.Metadata), angularNonBindAble(document.Content)),
+		1,
+	)
 	componentTemplate = strings.Replace(componentTemplate, "{{importComponentList}}", strings.Join(make([]string, 0), ",\n   "), 1)
 	componentTemplate = strings.Replace(componentTemplate, "{{componentName}}", componentName, 1)
 

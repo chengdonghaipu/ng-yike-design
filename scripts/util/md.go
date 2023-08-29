@@ -177,8 +177,10 @@ func convertToHTML(markdown string) string {
 }
 
 type GlobalDocMetadata struct {
-	Order int    `yaml:"order"`
-	Title string `yaml:"title"`
+	Order    int    `yaml:"order"`
+	Title    string `yaml:"title"`
+	Subtitle string `yaml:"subtitle"`
+	Widget   string `yaml:"widget"`
 }
 
 type GlobalDocument struct {
