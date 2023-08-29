@@ -157,10 +157,47 @@ func (receiver *GlobalDocs) Generate() error {
 	}
 
 	routeTemplate = strings.Replace(routeTemplate, "{{imports}}", strings.Join(routeConfig.Imports, "\n"), 1)
-	routeTemplate = strings.Replace(routeTemplate, "{{routes}}", strings.Join(routeConfig.RouteList, ",\n  "), 1)
+	routeTemplate = strings.Replace(routeTemplate, "{{routes}}", strings.Join(routeConfig.RouteList, ",\n      "), 1)
 	// introduce.routes.ts
 
 	err = util.WriteFile(routerPath, routeTemplate)
+	if err != nil {
+		return err
+	}
+
+	return receiver.generateDocsLayout()
+}
+
+func (receiver *GlobalDocs) generateDocsLayout() error {
+	layoutTemplatePath := path.Join("template", "introduces-layout")
+	layoutTemplate, err := util.ReadFile(layoutTemplatePath)
+	var navList []string
+
+	if err != nil {
+		return err
+	}
+
+	for _, document := range receiver.Documents {
+		if document.LangSimple != "zh" {
+			continue
+		}
+
+		navList = append(
+			navList,
+			fmt.Sprintf(
+				"        <li routerLink=\"%s\" routerLinkActive=\"router-active\"><a >%s</a></li>",
+				fmt.Sprintf("/docs/%s", document.RoutePath),
+				document.Metadata.Title,
+			),
+		)
+	}
+
+	layoutTemplate = strings.Replace(layoutTemplate, "{{navList}}", strings.Join(navList, "\n"), 1)
+
+	introducesDir := path.Join(receiver.DocDir, "src", "app", "introduces")
+	layoutPath := path.Join(introducesDir, "introduces.component.ts")
+
+	err = util.WriteFile(layoutPath, layoutTemplate)
 	if err != nil {
 		return err
 	}
