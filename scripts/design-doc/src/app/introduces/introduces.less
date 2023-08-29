@@ -1,0 +1,44 @@
+:host {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 100%;
+
+  .side {
+    width: 210px;
+    overflow: auto;
+
+    li {
+      display: flex;
+      align-items: center;
+      transition: all .3s ease-in-out;
+      padding: 0 16px 0 40px;
+      margin-top: 4px;
+      height: 40px;
+      line-height: 40px;
+      cursor: pointer;
+      user-select: none;
+
+      >a {
+        transition: all .3s ease-in-out;
+      }
+
+      &.router-active {
+        background-color: #e6f7ff;
+        a {
+          color: #1890ff;
+        }
+      }
+
+      &:hover a {
+        color: #1890ff;
+      }
+    }
+  }
+
+  .doc-box {
+    height: inherit;
+    overflow: auto;
+    flex: 1;
+    padding: 0 32px 32px;
+  }
+}

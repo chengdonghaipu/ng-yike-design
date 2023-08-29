@@ -1,7 +1,12 @@
 import { Routes } from '@angular/router';
+import { IntroducesComponent } from "./introduces.component";
 
 export const routes: Routes = [
-  // {path: 'home', component: AdminHomeComponent},
-  // {path: 'users', component: AdminUsersComponent},
-  // { path: 'introduce/', component: true}
+  {
+    path: '',
+    component: IntroducesComponent,
+    children: [
+
+    ]
+  }
 ];
