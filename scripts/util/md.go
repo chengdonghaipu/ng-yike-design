@@ -1,9 +1,13 @@
 package util
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/go-yaml/yaml"
 	"github.com/russross/blackfriday/v2"
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/renderer/html"
 	"io/ioutil"
 	"path"
 	"path/filepath"
@@ -38,6 +42,10 @@ type ApiDocument struct {
 	Api         string // Api章节的所有内容 并转换为HTML
 	Language    string // 默认 zhCN 根据文件名称来定的
 	Description string // 组件描述 也就是这部分“按钮用于开始一个即时操作。” 并转换为HTML
+}
+
+type MyHTMLRenderer struct {
+	blackfriday.HTMLRenderer
 }
 
 func ParseApiDocument(filePath string) (*ApiDocument, error) {
@@ -182,6 +190,23 @@ type GlobalDocument struct {
 	RoutePath  string
 }
 
+type customRenderer struct {
+	blackfriday.Renderer
+}
+
+func customHeadingRenderer() blackfriday.Renderer {
+	return &customRenderer{}
+}
+
+func (c *customRenderer) Header(out *strings.Builder, text func() bool, level int, id string) {
+	tag := fmt.Sprintf("h%d", level)
+	fmt.Fprintf(out, "<%s id=\"%s\">", tag, id)
+	if text != nil {
+		text()
+	}
+	fmt.Fprintf(out, "</%s>\n", tag)
+}
+
 func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 	mdContent, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -211,9 +236,22 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 	if err := yaml.Unmarshal([]byte(yamlContent), &metadata); err != nil {
 		return nil, fmt.Errorf("error parsing YAML: %w", err)
 	}
+	var htmlString bytes.Buffer
+	md := goldmark.New(
+		goldmark.WithExtensions(extension.GFM),
+		goldmark.WithRenderer(HtmlRenderer()),
+		goldmark.WithRendererOptions(html.WithUnsafe()),
+	)
 
-	htmlOutput := blackfriday.Run([]byte(markdownContent))
-	htmlString := string(htmlOutput)
+	if err := md.Convert([]byte(markdownContent), &htmlString); err != nil {
+		panic(err)
+	}
+	//renderer := &CustomHTMLRenderer{}
+	//htmlOutput := blackfriday.Run(
+	//	[]byte(markdownContent),
+	//	blackfriday.WithRenderer(renderer),
+	//	blackfriday.WithExtensions(blackfriday.CommonExtensions),
+	//)
 
 	var globalDoc GlobalDocument
 
@@ -221,7 +259,7 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 	// Detecting language
 	globalDoc.Language = parentDirName
 
-	globalDoc.Content = htmlString
+	globalDoc.Content = htmlString.String()
 	globalDoc.FileName = fileName
 	globalDoc.LangSimple = strings.Split(parentDirName, "-")[0]
 	globalDoc.RoutePath = fmt.Sprintf("%s/%s", fileName, globalDoc.LangSimple)
