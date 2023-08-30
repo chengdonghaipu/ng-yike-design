@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/go-yaml/yaml"
-	"github.com/russross/blackfriday/v2"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
 	"io/ioutil"
+	"ng-yike-design/script/flows"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -44,10 +44,6 @@ type ApiDocument struct {
 	Description string // 组件描述 也就是这部分“按钮用于开始一个即时操作。” 并转换为HTML
 }
 
-type MyHTMLRenderer struct {
-	blackfriday.HTMLRenderer
-}
-
 func ParseApiDocument(filePath string) (*ApiDocument, error) {
 	mdContent, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -68,20 +64,11 @@ func ParseApiDocument(filePath string) (*ApiDocument, error) {
 		return nil, fmt.Errorf("error parsing YAML: %w", err)
 	}
 
-	htmlOutput := blackfriday.Run([]byte(markdownContent))
-	htmlString := string(htmlOutput)
-
 	var apiDoc ApiDocument
 
+	fileNameWithExt := filepath.Base(filePath)
+	apiDoc.Language = strings.TrimSuffix(fileNameWithExt, filepath.Ext(fileNameWithExt))
 	apiDoc.Metadata = metadata
-	// Detecting language
-	if strings.Contains(filePath, "zh-CN") {
-		apiDoc.Language = "zh-CN"
-	} else if strings.Contains(filePath, "en-US") {
-		apiDoc.Language = "en-US"
-	} else {
-		apiDoc.Language = "zh-CN"
-	}
 
 	languageToTitle := map[string]map[string]string{
 		"zh-CN": {
@@ -97,41 +84,51 @@ func ParseApiDocument(filePath string) (*ApiDocument, error) {
 	}
 
 	if titleMap, ok := languageToTitle[apiDoc.Language]; ok {
-		// Extracting section content
-		apiDoc.Use = getApiSectionContentIncludeTitle(htmlString, titleMap["何时使用"])
-		apiDoc.Api = getApiSectionContentIncludeTitle(htmlString, titleMap["API"])
-		apiDoc.Description = getApiSectionContent(htmlString, titleMap["组件描述"])
+		flows.ParallelTask([]*flows.Task{
+			flows.NewAutoNameTask(func() error {
+				apiDoc.Use = convertToHTML(getSectionContentIncludeTitle(markdownContent, titleMap["何时使用"]))
+				return nil
+			}),
+			flows.NewAutoNameTask(func() error {
+				apiDoc.Api = convertToHTML(getSectionContentIncludeTitle(markdownContent, titleMap["API"]))
+				return nil
+			}),
+			flows.NewAutoNameTask(func() error {
+				apiDoc.Description = convertToHTML(getSectionContent(markdownContent, titleMap["组件描述"]))
+				return nil
+			}),
+		})
 	}
 
 	return &apiDoc, nil
 }
 
-func getApiSectionContent(htmlString, sectionTitle string) string {
-	re := regexp.MustCompile(fmt.Sprintf(`<h2>%s<\/h2>([\s\S]*?)(<\/h2>|<h2>|\z)`, sectionTitle))
-	match := re.FindStringSubmatch(htmlString)
-	if len(match) > 1 {
-		return match[1]
-	}
-	return ""
-}
-
-func getApiSectionContentIncludeTitle(htmlString, sectionTitle string) string {
-	re := regexp.MustCompile(fmt.Sprintf(`(<h2>%s<\/h2>[\s\S]*?)(<\/h2>|<h2>|\z)`, sectionTitle))
-	match := re.FindStringSubmatch(htmlString)
-	if len(match) > 1 {
-		return match[1]
-	}
-	return ""
-}
-
-func getDescription(htmlString string) string {
-	re := regexp.MustCompile(`## [^\n]+\n\n([\s\S]+?)(?:\n\n## |\z)`)
-	match := re.FindStringSubmatch(htmlString)
-	if len(match) > 1 {
-		return match[1]
-	}
-	return ""
-}
+//func getApiSectionContent(htmlString, sectionTitle string) string {
+//	re := regexp.MustCompile(fmt.Sprintf(`<h2>%s<\/h2>([\s\S]*?)(<\/h2>|<h2>|\z)`, sectionTitle))
+//	match := re.FindStringSubmatch(htmlString)
+//	if len(match) > 1 {
+//		return match[1]
+//	}
+//	return ""
+//}
+//
+//func getApiSectionContentIncludeTitle(htmlString, sectionTitle string) string {
+//	re := regexp.MustCompile(fmt.Sprintf(`(<h2>%s<\/h2>[\s\S]*?)(<\/h2>|<h2>|\z)`, sectionTitle))
+//	match := re.FindStringSubmatch(htmlString)
+//	if len(match) > 1 {
+//		return match[1]
+//	}
+//	return ""
+//}
+//
+//func getDescription(htmlString string) string {
+//	re := regexp.MustCompile(`## [^\n]+\n\n([\s\S]+?)(?:\n\n## |\z)`)
+//	match := re.FindStringSubmatch(htmlString)
+//	if len(match) > 1 {
+//		return match[1]
+//	}
+//	return ""
+//}
 
 func ParseMarkdown(filePath string) (*Document, error) {
 	mdContent, err := ioutil.ReadFile(filePath)
@@ -162,8 +159,8 @@ func ParseMarkdown(filePath string) (*Document, error) {
 	return &document, nil
 }
 
-func getSectionContent(content, section string) string {
-	re := regexp.MustCompile(fmt.Sprintf(`(?m)^## %s\n\n(.*?)\n\n`, section))
+func getSectionContentIncludeTitle(content, section string) string {
+	re := regexp.MustCompile(fmt.Sprintf(`(?m)^(## %s\n+.*?)\n+`, section))
 	match := re.FindStringSubmatch(content)
 	if len(match) > 1 {
 		return match[1]
@@ -171,9 +168,28 @@ func getSectionContent(content, section string) string {
 	return ""
 }
 
-func convertToHTML(markdown string) string {
-	htmlOutput := blackfriday.Run([]byte(markdown))
-	return string(htmlOutput)
+func getSectionContent(content, section string) string {
+	re := regexp.MustCompile(fmt.Sprintf(`(?m)^## %s\n+(.*?)\n+`, section))
+	match := re.FindStringSubmatch(content)
+	if len(match) > 1 {
+		return match[1]
+	}
+	return ""
+}
+
+func convertToHTML(markdownContent string) string {
+	var htmlOutput bytes.Buffer
+
+	md := goldmark.New(
+		goldmark.WithExtensions(extension.GFM),
+		goldmark.WithRenderer(HtmlRenderer()),
+		goldmark.WithRendererOptions(html.WithUnsafe()),
+	)
+
+	if err := md.Convert([]byte(markdownContent), &htmlOutput); err != nil {
+		panic(err)
+	}
+	return htmlOutput.String()
 }
 
 type GlobalDocMetadata struct {
@@ -192,28 +208,13 @@ type GlobalDocument struct {
 	RoutePath  string
 }
 
-type customRenderer struct {
-	blackfriday.Renderer
-}
-
-func customHeadingRenderer() blackfriday.Renderer {
-	return &customRenderer{}
-}
-
-func (c *customRenderer) Header(out *strings.Builder, text func() bool, level int, id string) {
-	tag := fmt.Sprintf("h%d", level)
-	fmt.Fprintf(out, "<%s id=\"%s\">", tag, id)
-	if text != nil {
-		text()
-	}
-	fmt.Fprintf(out, "</%s>\n", tag)
-}
-
 func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 	mdContent, err := ioutil.ReadFile(filePath)
+
 	if err != nil {
 		return nil, err
 	}
+
 	filePath = strings.Replace(filePath, "\\", "/", -1)
 	dirPath := path.Dir(filePath)
 
@@ -221,6 +222,7 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 
 	re := regexp.MustCompile(`---\n([\s\S]*?)\n---`)
 	match := re.FindStringSubmatch(string(mdContent))
+
 	if len(match) < 2 {
 		return nil, fmt.Errorf("YAML section not found")
 	}
@@ -235,10 +237,13 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 	fileName := strings.TrimSuffix(fileNameWithExtension, filepath.Ext(fileNameWithExtension))
 
 	var metadata GlobalDocMetadata
+
 	if err := yaml.Unmarshal([]byte(yamlContent), &metadata); err != nil {
 		return nil, fmt.Errorf("error parsing YAML: %w", err)
 	}
+
 	var htmlString bytes.Buffer
+
 	md := goldmark.New(
 		goldmark.WithExtensions(extension.GFM),
 		goldmark.WithRenderer(HtmlRenderer()),
@@ -249,16 +254,14 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 		panic(err)
 	}
 
-	var globalDoc GlobalDocument
-
-	globalDoc.Metadata = metadata
-	// Detecting language
-	globalDoc.Language = parentDirName
-
-	globalDoc.Content = htmlString.String()
-	globalDoc.FileName = fileName
-	globalDoc.LangSimple = strings.Split(parentDirName, "-")[0]
-	globalDoc.RoutePath = fmt.Sprintf("%s/%s", fileName, globalDoc.LangSimple)
+	globalDoc := GlobalDocument{
+		Metadata:   metadata,
+		Language:   parentDirName,
+		Content:    htmlString.String(),
+		FileName:   fileName,
+		LangSimple: strings.Split(parentDirName, "-")[0],
+		RoutePath:  strings.Split(parentDirName, "-")[0],
+	}
 
 	return &globalDoc, nil
 }

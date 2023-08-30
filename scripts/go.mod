@@ -6,11 +6,11 @@ require (
 	github.com/alecthomas/chroma v0.10.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-yaml/yaml v2.1.0+incompatible
+	github.com/google/uuid v1.3.1
 	github.com/gookit/color v1.5.4
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.7.0
 	github.com/yuin/goldmark v1.5.6
-	golang.org/x/net v0.14.0
 )
 
 require (

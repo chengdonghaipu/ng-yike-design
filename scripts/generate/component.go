@@ -111,12 +111,6 @@ func (receiver *Component) OutputComponent(demoDir, filename string) {
 
 }
 func (receiver *Component) CollectComponent(demoDir, filename string) {
-	//err := receiver.CopyComponent(demoDir, filename)
-	//if err != nil {
-	//  fmt.Println("err: ", err)
-	//  return
-	//}
-
 	receiver.resolveMd(demoDir, filename)
 
 	sort.Slice(receiver.DemoDocuments, func(i, j int) bool {

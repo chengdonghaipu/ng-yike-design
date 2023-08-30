@@ -2,6 +2,7 @@ package flows
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/gookit/color"
 	"sync"
 	"time"
@@ -16,6 +17,7 @@ type Task struct {
 	done         bool
 	StartTime    time.Time
 	EndTime      time.Time
+	noOutputLog  bool
 }
 
 func printExecutionTime(task *Task) {
@@ -30,6 +32,21 @@ func NewTask(name string, work func() error) *Task {
 		done: false,
 	}
 	task.cond = sync.NewCond(&task.mu)
+	return task
+}
+
+func NewAutoNameTask(work func() error) *Task {
+	name := uuid.New().String()
+	task := NewTask(name, work)
+	task.noOutputLog = true
+
+	return task
+}
+
+func NewNoLogTask(name string, work func() error) *Task {
+	task := NewTask(name, work)
+	task.noOutputLog = true
+
 	return task
 }
 
@@ -50,7 +67,9 @@ func (t *Task) Run() error {
 	defer t.mu.Unlock()
 
 	t.StartTime = time.Now()
-	color.Green.Println(fmt.Sprintf("[%s] Task started", t.Name))
+	if !t.noOutputLog {
+		color.Green.Println(fmt.Sprintf("[%s] Task started", t.Name))
+	}
 	err := t.Work()
 	if err != nil {
 		return err
@@ -58,7 +77,9 @@ func (t *Task) Run() error {
 	t.EndTime = time.Now()
 
 	t.done = true
-	printExecutionTime(t)
+	if !t.noOutputLog {
+		printExecutionTime(t)
+	}
 	t.cond.Broadcast()
 
 	return nil

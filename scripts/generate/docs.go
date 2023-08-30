@@ -157,6 +157,7 @@ func (receiver *GlobalDocs) UpdateByPath(mdPath string) {
 	}
 
 	if addFlag {
+		// 更新布局
 		receiver.generateDocsLayout()
 	}
 }

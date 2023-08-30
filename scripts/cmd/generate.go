@@ -113,6 +113,7 @@ func (receiver *CompileDocTask) registrationTask() {
 	receiver.CollectGlobalDocsTask = flows.NewTask("收集全局文档信息", receiver.collectGlobalDocsTaskHandler)
 	receiver.CollectComponentDocsTask = flows.NewTask("收集组件文档信息", receiver.collectComponentDocsTaskHandler)
 	receiver.GenerateGlobalDocsTask = flows.NewTask("生成全局文档", receiver.generateGlobalDocsTaskHandler)
+
 	receiver.GenerateGlobalDocsTask.SetDependency(
 		receiver.CopyDesignDocTask,
 		receiver.CollectGlobalDocsTask,
@@ -233,7 +234,7 @@ func watchDoc(cmd *cobra.Command, compileDocTask *CompileDocTask) {
 					continue
 				}
 				if changed {
-					fmt.Println("File modified:", event.Name, event.Op.String())
+					//fmt.Println("File modified:", event.Name, event.Op.String())
 					compileDocTask.UpdateByPath(event.Name)
 					content, err := ioutil.ReadFile(event.Name)
 					if err != nil {
