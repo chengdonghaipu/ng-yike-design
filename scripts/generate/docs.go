@@ -53,9 +53,11 @@ func generateTitle(meta util.GlobalDocMetadata) string {
 func angularNonBindAble(content string) string {
 	reOpenBrace := regexp.MustCompile(`{`)
 	reCloseBrace := regexp.MustCompile(`}`)
+	reAcute := regexp.MustCompile("`")
 
 	content = reOpenBrace.ReplaceAllString(content, "&#123;")
 	content = reCloseBrace.ReplaceAllString(content, "&#125;")
+	content = reAcute.ReplaceAllString(content, "&acute;")
 
 	return content
 }
@@ -74,7 +76,7 @@ func (receiver *GlobalDocs) generateComponent(document *util.GlobalDocument, out
 
 	componentName := fmt.Sprintf(
 		"NxDoc%s%sComponent",
-		util.CapitalizeFirstLetter(document.FileName),
+		util.CapitalizeFirstLetter(strings.ReplaceAll(document.FileName, "-", "")),
 		util.CapitalizeFirstLetter(strings.Split(document.Language, "-")[0]),
 	)
 

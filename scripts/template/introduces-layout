@@ -10,7 +10,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
     <div class="side">
       <ul>
 {{navList}}
-
       </ul>
     </div>
     <div class="doc-box">
