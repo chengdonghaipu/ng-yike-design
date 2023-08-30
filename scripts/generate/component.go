@@ -102,23 +102,40 @@ func compileDemoDocLayout(docDir string, components []*Component, lang string) e
 		return err
 	}
 
-	for _, document := range components {
-		zhDoc := document.getApiComponentByLang(lang)
+	groupedItems := make(map[string][]*Component)
+
+	for _, item := range components {
+		zhDoc := item.getApiComponentByLang(lang)
 
 		if zhDoc == nil {
 			continue
 		}
 
+		groupedItems[zhDoc.Metadata.Type] = append(groupedItems[zhDoc.Metadata.Type], item)
+	}
+
+	for typeValue, typeItems := range groupedItems {
 		navList = append(
 			navList,
 			fmt.Sprintf(
-				"        <li routerLink=\"%s\" routerLinkActive=\"router-active\"><a >%s<span class=\"subtitle\">%s</span></a></li>",
-				// TODO 暂时只生成zh
-				fmt.Sprintf("/components/%s/%s", document.Name, lang),
-				zhDoc.Metadata.Title,
-				zhDoc.Metadata.Subtitle,
+				"        <li class=\"menu-item-group\"><div class=\"item-group-title\">%s</div></li>",
+				typeValue,
 			),
 		)
+
+		for _, document := range typeItems {
+			zhDoc := document.getApiComponentByLang(lang)
+
+			navList = append(
+				navList,
+				fmt.Sprintf(
+					"        <li routerLink=\"%s\" routerLinkActive=\"router-active\"><a >%s<span class=\"subtitle\">%s</span></a></li>",
+					fmt.Sprintf("/components/%s/%s", document.Name, lang),
+					zhDoc.Metadata.Title,
+					zhDoc.Metadata.Subtitle,
+				),
+			)
+		}
 	}
 
 	layoutTemplate = strings.Replace(layoutTemplate, "{{navList}}", strings.Join(navList, "\n"), 1)
