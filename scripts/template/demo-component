@@ -5,7 +5,7 @@ import { CommonModule } from "@angular/common";
 @Component({
   selector     : 'app-demo-{{demoName}}-{{lang}}',
   standalone: true,
-  template     : ``,
+  template     : `{{template}}`,
   imports: [
    CommonModule,
    {{importComponentList}}

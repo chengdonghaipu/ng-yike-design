@@ -407,6 +407,21 @@ func (receiver *Component) CopyComponent(filename string, wg *sync.WaitGroup) {
 	}
 }
 
+func generateDemoDocTitle(meta util.ApiDocMetadata) string {
+	docTitleTemplatePath := path.Join("template", "demo-title")
+	docTitleTemplate, err := util.ReadFile(docTitleTemplatePath)
+
+	if err != nil {
+		return ""
+	}
+
+	docTitleTemplate = strings.Replace(docTitleTemplate, "{{title}}", meta.Title, 1)
+	docTitleTemplate = strings.Replace(docTitleTemplate, "{{subtitle}}", meta.Subtitle, 1)
+	docTitleTemplate = strings.Replace(docTitleTemplate, "{{widget}}", "", 1)
+
+	return docTitleTemplate
+}
+
 func (receiver *Component) OutputTemplate(lang string) error {
 	demoName := receiver.Name
 	demoMetas := receiver.DemoMetas
@@ -429,9 +444,40 @@ func (receiver *Component) OutputTemplate(lang string) error {
 		return err
 	}
 
+	templateString := ""
+	//langMap := map[string]func(document *util.Document){
+	//	"zh": func(document *util.Document) {
+	//		templateString += document.ZhCN
+	//	},
+	//	"en": func(document *util.Document) {
+	//		templateString += document.EnUS
+	//	},
+	//}
+
+	for _, document := range receiver.ComponentDocuments {
+		if document.Language != lang && !strings.Contains(document.Language, lang) {
+			continue
+		}
+
+		templateContent := document.Description
+		templateContent += document.Use
+		templateContent += document.Api
+
+		templateString += wrapperDocs(generateDemoDocTitle(document.Metadata), angularNonBindAble(templateContent))
+	}
+
+	//for _, document := range receiver.DemoDocuments {
+	//	if _, ok := langMap[lang]; !ok {
+	//		continue
+	//	}
+	//
+	//	langMap[lang](document)
+	//}
+
 	template = strings.Replace(template, "{{imports}}", strings.Join(importDepComponentList, "\n"), 1)
 	template = strings.Replace(template, "{{demoName}}", demoName, 1)
 	template = strings.Replace(template, "{{lang}}", lang, 1)
+	template = strings.Replace(template, "{{template}}", templateString, 1)
 	template = strings.Replace(template, "{{importComponentList}}", strings.Join(importComponentList, ",\n   "), 1)
 	template = strings.Replace(template, "{{componentName}}", componentName, 1)
 

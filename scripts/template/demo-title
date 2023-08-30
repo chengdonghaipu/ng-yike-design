@@ -1,0 +1,3 @@
+<h1>{{title}}<span class="subtitle">{{subtitle}}</span><span class="widget">{{widget}}</span>
+
+</h1>
