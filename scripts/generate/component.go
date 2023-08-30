@@ -10,6 +10,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -179,22 +180,15 @@ func withRouteConfig(components []*Component, lang string, out interface{}) erro
 	}
 
 	for _, component := range components {
+		loadChildren := fmt.Sprintf(
+			"() => import('./%s/%s.component').then(mod => mod.%s)",
+			component.Name,
+			lang,
+			component.GenerateComponentName(lang),
+		)
 		originalVal.RouteList = append(
 			originalVal.RouteList,
-			fmt.Sprintf("{ path: '%s', component: %s }", component.GenerateRoutePath(lang), component.GenerateComponentName(lang)),
-		)
-
-		originalVal.Imports = append(
-			originalVal.Imports,
-			fmt.Sprintf(
-				"import { %s } from './%s/%s';",
-				component.GenerateComponentName(lang),
-				component.Name,
-				fmt.Sprintf(
-					"%s.component",
-					lang,
-				),
-			),
+			fmt.Sprintf("{ path: '%s', loadComponent: %s }", component.GenerateRoutePath(lang), loadChildren),
 		)
 	}
 
@@ -220,6 +214,19 @@ func compileDemoRoute(docDir string, components []*Component) error {
 
 	_ = withRouteConfig(components, "zh", &routeConfig)
 	_ = withRouteConfig(components, "en", &routeConfig)
+
+	firstRoute := routeConfig.RouteList[0]
+
+	pattern := `'([^']+)'\s*,\s*(component|loadComponent)`
+
+	re := regexp.MustCompile(pattern)
+	match := re.FindStringSubmatch(firstRoute)
+
+	if len(match) > 1 {
+		routeConfig.RouteList = append([]string{
+			fmt.Sprintf("{ path: '', redirectTo: '%s', pathMatch: 'full' }", match[1]),
+		}, routeConfig.RouteList...)
+	}
 
 	routeTemplate = strings.Replace(routeTemplate, "{{imports}}", strings.Join(routeConfig.Imports, "\n"), 1)
 	routeTemplate = strings.Replace(routeTemplate, "{{routes}}", strings.Join(routeConfig.RouteList, ",\n      "), 1)
@@ -424,6 +431,7 @@ func (receiver *Component) OutputTemplate(lang string) error {
 
 	template = strings.Replace(template, "{{imports}}", strings.Join(importDepComponentList, "\n"), 1)
 	template = strings.Replace(template, "{{demoName}}", demoName, 1)
+	template = strings.Replace(template, "{{lang}}", lang, 1)
 	template = strings.Replace(template, "{{importComponentList}}", strings.Join(importComponentList, ",\n   "), 1)
 	template = strings.Replace(template, "{{componentName}}", componentName, 1)
 

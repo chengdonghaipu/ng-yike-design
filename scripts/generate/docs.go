@@ -189,6 +189,20 @@ func (receiver *GlobalDocs) Generate() error {
 
 	routeConfig = receiver.routeConfig
 
+	firstRoute := routeConfig.RouteList[0]
+
+	pattern := `'([^']+)'\s*,\s*component`
+
+	re := regexp.MustCompile(pattern)
+	match := re.FindStringSubmatch(firstRoute)
+
+	if len(match) > 1 {
+		path := match[1]
+		routeConfig.RouteList = append([]string{
+			fmt.Sprintf("{ path: '', redirectTo: '%s', pathMatch: 'full' }", path),
+		}, routeConfig.RouteList...)
+	}
+
 	routeTemplate = strings.Replace(routeTemplate, "{{imports}}", strings.Join(routeConfig.Imports, "\n"), 1)
 	routeTemplate = strings.Replace(routeTemplate, "{{routes}}", strings.Join(routeConfig.RouteList, ",\n      "), 1)
 	// introduce.routes.ts

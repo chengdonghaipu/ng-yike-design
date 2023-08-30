@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common";
 {{imports}}
 
 @Component({
-  selector     : 'app-demo-{{demoName}}',
+  selector     : 'app-demo-{{demoName}}-{{lang}}',
   standalone: true,
   template     : ``,
   imports: [
