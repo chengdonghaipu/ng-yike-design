@@ -24,6 +24,7 @@ type Metadata struct {
 }
 
 type Document struct {
+	FileKey  string
 	Metadata Metadata
 	ZhCN     string
 	EnUS     string
@@ -33,6 +34,7 @@ type ApiDocMetadata struct {
 	Category string `yaml:"category"`
 	Type     string `yaml:"type"`
 	Title    string `yaml:"title"`
+	Cols     int64  `yaml:"cols"`
 	Subtitle string `yaml:"subtitle"`
 }
 
@@ -150,10 +152,17 @@ func ParseMarkdown(filePath string) (*Document, error) {
 		return nil, fmt.Errorf("error parsing YAML: %w", err)
 	}
 
+	// 获取文件名（包括扩展名）
+	fileNameWithExtension := filepath.Base(filePath)
+
+	// 去除扩展名
+	fileName := strings.TrimSuffix(fileNameWithExtension, filepath.Ext(fileNameWithExtension))
+
 	document := Document{
 		Metadata: metadata,
 		ZhCN:     convertToHTML(getSectionContent(markdownContent, "zh-CN")),
 		EnUS:     convertToHTML(getSectionContent(markdownContent, "en-US")),
+		FileKey:  fileName,
 	}
 
 	return &document, nil

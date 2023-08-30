@@ -425,6 +425,22 @@ func generateDemoDocTitle(meta util.ApiDocMetadata) string {
 func wrapperAPI(content string) string {
 	return fmt.Sprintf("<section class=\"markdown api-container\">%s</section>", content)
 }
+func wrapperUse(content string) string {
+	return fmt.Sprintf("<section class=\"markdown\">%s</section>", content)
+}
+
+func wrapperUnionDemo(content []string) string {
+	return fmt.Sprintf(
+		"<div>\n\t<div>\n\t\t%s\n\t</div>\n</div>", strings.Join(content, "\n"))
+}
+
+func wrapperSplitDemo(first, second []string) string {
+	return fmt.Sprintf(
+		"<div>\n\t<div>\n\t\t%s\n\t</div>\n\t<div>\n\t\t%s\n\t</div>\n</div>",
+		strings.Join(first, "\n"),
+		strings.Join(second, "\n"),
+	)
+}
 
 func (receiver *Component) OutputTemplate(lang string) error {
 	demoName := receiver.Name
@@ -446,6 +462,51 @@ func (receiver *Component) OutputTemplate(lang string) error {
 
 	if err != nil {
 		return err
+	}
+
+	codeBoxTemplatePath := path.Join("template", "code-box")
+	codeBoxTemplate, err := util.ReadFile(codeBoxTemplatePath)
+
+	if err != nil {
+		return nil
+	}
+
+	firstApiDoc := receiver.ComponentDocuments[0]
+	var first []string
+	var second []string
+
+	demoString := ""
+
+	for i, document := range receiver.DemoDocuments {
+		tempCodeBoxTemplate := codeBoxTemplate
+
+		if lang == "zh" {
+			tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{doc}}", document.ZhCN)
+			tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{title}}", document.Metadata.Title.ZhCN)
+		} else {
+			tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{doc}}", document.EnUS)
+			tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{title}}", document.Metadata.Title.EnUS)
+		}
+
+		tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{key}}", document.FileKey)
+		tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{component}}", receiver.Name)
+
+		//document.Metadata.Title
+		if firstApiDoc.Metadata.Cols != 0 {
+			if (i+1)%2 == 0 {
+				second = append(second, tempCodeBoxTemplate)
+			} else {
+				first = append(first, tempCodeBoxTemplate)
+			}
+		} else {
+			first = append(first, tempCodeBoxTemplate)
+		}
+	}
+
+	if len(second) != 0 {
+		demoString = wrapperSplitDemo(first, second)
+	} else {
+		demoString = wrapperUnionDemo(first)
 	}
 
 	templateString := ""
@@ -472,21 +533,12 @@ func (receiver *Component) OutputTemplate(lang string) error {
 
 		examplesTitleTemplate = strings.Replace(examplesTitleTemplate, "{{title}}", examplesTitle, 1)
 
-		templateContent := document.Description
-		templateContent += document.Use
-		templateContent += examplesTitleTemplate
+		templateContent := wrapperUse(generateDemoDocTitle(document.Metadata) + document.Description + document.Use + examplesTitleTemplate)
+		templateContent += demoString
 		templateContent += wrapperAPI(document.Api)
 
-		templateString += wrapperDocs(generateDemoDocTitle(document.Metadata), angularNonBindAble(templateContent))
+		templateString += angularNonBindAble(templateContent)
 	}
-
-	//for _, document := range receiver.DemoDocuments {
-	//	if _, ok := langMap[lang]; !ok {
-	//		continue
-	//	}
-	//
-	//	langMap[lang](document)
-	//}
 
 	template = strings.Replace(template, "{{imports}}", strings.Join(importDepComponentList, "\n"), 1)
 	template = strings.Replace(template, "{{demoName}}", demoName, 1)

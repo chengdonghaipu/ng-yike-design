@@ -1,5 +1,6 @@
 import { Component, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule } from "@angular/common";
+import { CodeBoxComponent } from "../../code-box/code-box.component";
 {{imports}}
 
 @Component({
@@ -8,6 +9,7 @@ import { CommonModule } from "@angular/common";
   template     : `{{template}}`,
   imports: [
    CommonModule,
+   CodeBoxComponent,
    {{importComponentList}}
   ],
 })

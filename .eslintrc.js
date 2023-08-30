@@ -56,6 +56,7 @@ module.exports = {
         '@angular-eslint/no-attribute-decorator': 'error',
         '@angular-eslint/no-conflicting-lifecycle': 'off',
         '@angular-eslint/no-forward-ref': 'off',
+        '@angular-eslint/template/click-events-have-key-events': 'off',
         '@angular-eslint/no-host-metadata-property': 'off',
         '@angular-eslint/no-lifecycle-call': 'off',
         '@angular-eslint/no-pipe-impure': 'error',

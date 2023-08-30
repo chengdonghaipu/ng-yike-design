@@ -1,0 +1,6 @@
+<app-code-box nxTitle="{{title}}" nxId="component-{{component}}-demo-{{key}}">
+  <app-demo-{{component}}-{{key}} demo></app-demo-{{component}}-{{key}}>
+  <div intro>
+    {{doc}}
+  </div>
+</app-code-box>
