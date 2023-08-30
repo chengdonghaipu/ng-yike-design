@@ -214,7 +214,7 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	filePath = strings.Replace(filePath, "\\", "/", -1)
 	dirPath := path.Dir(filePath)
 
 	_, parentDirName := path.Split(dirPath)
@@ -248,12 +248,6 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 	if err := md.Convert([]byte(markdownContent), &htmlString); err != nil {
 		panic(err)
 	}
-	//renderer := &CustomHTMLRenderer{}
-	//htmlOutput := blackfriday.Run(
-	//	[]byte(markdownContent),
-	//	blackfriday.WithRenderer(renderer),
-	//	blackfriday.WithExtensions(blackfriday.CommonExtensions),
-	//)
 
 	var globalDoc GlobalDocument
 

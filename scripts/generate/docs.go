@@ -14,9 +14,10 @@ import (
 )
 
 type GlobalDocs struct {
-	RootDir   string
-	Documents []*util.GlobalDocument
-	DocDir    string
+	RootDir     string
+	Documents   []*util.GlobalDocument
+	DocDir      string
+	routeConfig *RouteConfig
 }
 
 func NewGlobalDocs(rootDir string, docDir string) *GlobalDocs {
@@ -32,7 +33,8 @@ func wrapperDocs(title, content string) string {
 	return fmt.Sprintf(
 		"<article class=\"markdown\">%s\n  <section class=\"markdown\" ngNonBindable>%s</section>\n  </article>",
 		title,
-		content)
+		content,
+	)
 }
 
 func generateTitle(meta util.GlobalDocMetadata) string {
@@ -138,6 +140,27 @@ func (receiver *GlobalDocs) generateComponent(document *util.GlobalDocument, out
 	return nil
 }
 
+func (receiver *GlobalDocs) UpdateByPath(mdPath string) {
+	if !strings.HasSuffix(mdPath, ".md") {
+		return
+	}
+	// 收集 doc info
+	document, addFlag := receiver.resolveMdByPath(mdPath)
+
+	if document == nil {
+		return
+	}
+	// 生成 doc component
+	err := receiver.generateComponent(document, &receiver.routeConfig)
+	if err != nil {
+		return
+	}
+
+	if addFlag {
+		receiver.generateDocsLayout()
+	}
+}
+
 func (receiver *GlobalDocs) Generate() error {
 	introducesDir := path.Join(receiver.DocDir, "src", "app", "introduces")
 	routerPath := path.Join(introducesDir, "introduce.routes.ts")
@@ -150,13 +173,20 @@ func (receiver *GlobalDocs) Generate() error {
 		return err
 	}
 
+	if receiver.routeConfig != nil {
+		receiver.routeConfig.RouteList = []string{}
+		receiver.routeConfig.Imports = []string{}
+	}
+
 	for _, document := range receiver.Documents {
-		err := receiver.generateComponent(document, &routeConfig)
+		err := receiver.generateComponent(document, &receiver.routeConfig)
 
 		if err != nil {
 			return err
 		}
 	}
+
+	routeConfig = receiver.routeConfig
 
 	routeTemplate = strings.Replace(routeTemplate, "{{imports}}", strings.Join(routeConfig.Imports, "\n"), 1)
 	routeTemplate = strings.Replace(routeTemplate, "{{routes}}", strings.Join(routeConfig.RouteList, ",\n      "), 1)
@@ -236,6 +266,34 @@ func (receiver *GlobalDocs) Collect() error {
 	return nil
 }
 
+func (receiver *GlobalDocs) resolveMdByPath(mdPath string) (*util.GlobalDocument, bool) {
+	document, err := util.ParseGlobalDocument(mdPath)
+
+	if err != nil {
+		log.Println("Error:", err)
+		return nil, false
+	}
+
+	findIndex := -1
+
+	for i, globalDocument := range receiver.Documents {
+		if globalDocument.RoutePath != document.RoutePath {
+			continue
+		}
+
+		findIndex = i
+	}
+
+	if findIndex > -1 {
+		receiver.Documents[findIndex] = document
+		return document, false
+	}
+
+	receiver.Documents = append(receiver.Documents, document)
+
+	return document, true
+}
+
 func (receiver *GlobalDocs) resolveMd(langDir string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
@@ -259,13 +317,6 @@ func (receiver *GlobalDocs) resolveMd(langDir string, wg *sync.WaitGroup) {
 
 		mdPath := path.Join(langDir, filename)
 
-		document, err := util.ParseGlobalDocument(mdPath)
-
-		if err != nil {
-			log.Println("Error:", err)
-			return
-		}
-
-		receiver.Documents = append(receiver.Documents, document)
+		receiver.resolveMdByPath(mdPath)
 	}
 }
