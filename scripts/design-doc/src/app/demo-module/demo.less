@@ -18,9 +18,28 @@
       cursor: pointer;
       user-select: none;
 
+      &.menu-item-group {
+        .item-group-title {
+          width: 100%;
+          &:after {
+            position: relative;
+            top: 0;
+            display: block;
+            width: calc(100% - 20px);
+            height: 1px;
+            background: rgba(0,0,0,.06);
+            content: "";
+          }
+        }
+      }
+
       >a {
         transition: all .3s ease-in-out;
         font-size: 14px;
+
+        .subtitle {
+          margin-left: 4px;
+        }
       }
 
       &.router-active {

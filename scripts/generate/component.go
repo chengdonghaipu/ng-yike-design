@@ -422,6 +422,10 @@ func generateDemoDocTitle(meta util.ApiDocMetadata) string {
 	return docTitleTemplate
 }
 
+func wrapperAPI(content string) string {
+	return fmt.Sprintf("<section class=\"markdown api-container\">%s</section>", content)
+}
+
 func (receiver *Component) OutputTemplate(lang string) error {
 	demoName := receiver.Name
 	demoMetas := receiver.DemoMetas
@@ -445,23 +449,33 @@ func (receiver *Component) OutputTemplate(lang string) error {
 	}
 
 	templateString := ""
-	//langMap := map[string]func(document *util.Document){
-	//	"zh": func(document *util.Document) {
-	//		templateString += document.ZhCN
-	//	},
-	//	"en": func(document *util.Document) {
-	//		templateString += document.EnUS
-	//	},
-	//}
 
 	for _, document := range receiver.ComponentDocuments {
 		if document.Language != lang && !strings.Contains(document.Language, lang) {
 			continue
 		}
 
+		examplesTitleTemplatePath := path.Join("template", "code-examples")
+		examplesTitleTemplate, err := util.ReadFile(examplesTitleTemplatePath)
+
+		if err != nil {
+			return nil
+		}
+
+		var examplesTitle string
+
+		if lang == "zh" {
+			examplesTitle = "代码演示"
+		} else {
+			examplesTitle = "Examples"
+		}
+
+		examplesTitleTemplate = strings.Replace(examplesTitleTemplate, "{{title}}", examplesTitle, 1)
+
 		templateContent := document.Description
 		templateContent += document.Use
-		templateContent += document.Api
+		templateContent += examplesTitleTemplate
+		templateContent += wrapperAPI(document.Api)
 
 		templateString += wrapperDocs(generateDemoDocTitle(document.Metadata), angularNonBindAble(templateContent))
 	}
