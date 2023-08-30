@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"ng-yike-design/script/flows"
 	"ng-yike-design/script/util"
 	"os"
 	"path"
@@ -57,7 +58,180 @@ type DemoMeta struct {
 	FilePath string
 }
 
+func (receiver *Component) copyDemoComponents() {
+	var wg sync.WaitGroup
+
+	for _, meta := range receiver.DemoMetas {
+		wg.Add(1)
+		go receiver.CopyComponent(meta.Filename, &wg)
+	}
+
+	wg.Wait()
+}
+
 func (receiver *Component) GenerateComponents() error {
+	if receiver.DemoMetas == nil {
+		return nil
+	}
+
+	receiver.copyDemoComponents()
+	receiver.OutputTemplate("en")
+
+	return receiver.OutputTemplate("zh")
+}
+
+func (receiver *Component) getApiComponentByLang(lang string) *util.ApiDocument {
+	for _, componentDocument := range receiver.ComponentDocuments {
+		if componentDocument.Language != lang && !strings.Contains(componentDocument.Language, lang) {
+			continue
+		}
+
+		return componentDocument
+	}
+
+	return nil
+}
+
+func compileDemoDocLayout(docDir string, components []*Component, lang string) error {
+	layoutTemplatePath := path.Join("template", "demo-container")
+	layoutTemplate, err := util.ReadFile(layoutTemplatePath)
+
+	var navList []string
+
+	if err != nil {
+		return err
+	}
+
+	for _, document := range components {
+		zhDoc := document.getApiComponentByLang(lang)
+
+		if zhDoc == nil {
+			continue
+		}
+
+		navList = append(
+			navList,
+			fmt.Sprintf(
+				"        <li routerLink=\"%s\" routerLinkActive=\"router-active\"><a >%s<span class=\"subtitle\">%s</span></a></li>",
+				// TODO 暂时只生成zh
+				fmt.Sprintf("/components/%s/%s", document.Name, lang),
+				zhDoc.Metadata.Title,
+				zhDoc.Metadata.Subtitle,
+			),
+		)
+	}
+
+	layoutTemplate = strings.Replace(layoutTemplate, "{{navList}}", strings.Join(navList, "\n"), 1)
+
+	demoDir := path.Join(docDir, "src", "app", "demo-module")
+	layoutPath := path.Join(demoDir, "demo.component.ts")
+
+	err = util.WriteFile(layoutPath, layoutTemplate)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func withRouteConfig(components []*Component, lang string, out interface{}) error {
+	val := reflect.ValueOf(out)
+
+	if val.Kind() != reflect.Ptr {
+		return fmt.Errorf("out must be a pointer")
+	}
+
+	// 获取指针指向的值的类型
+	val = val.Elem()
+
+	if val.Kind() != reflect.Pointer {
+		return fmt.Errorf("out must be a pointer")
+	}
+
+	originalVal, ok := val.Interface().(*RouteConfig)
+
+	if !ok {
+		return fmt.Errorf("out must be a pointer to a *RouteConfig")
+	}
+
+	if originalVal == nil {
+		originalVal = &RouteConfig{
+			RouteList: []string{},
+			Imports:   []string{},
+		}
+	}
+
+	for _, component := range components {
+		originalVal.RouteList = append(
+			originalVal.RouteList,
+			fmt.Sprintf("{ path: '%s', component: %s }", component.GenerateRoutePath(lang), component.GenerateComponentName(lang)),
+		)
+
+		originalVal.Imports = append(
+			originalVal.Imports,
+			fmt.Sprintf(
+				"import { %s } from './%s/%s';",
+				component.GenerateComponentName(lang),
+				component.Name,
+				fmt.Sprintf(
+					"%s.component",
+					lang,
+				),
+			),
+		)
+	}
+
+	val.Set(reflect.ValueOf(originalVal))
+
+	return nil
+}
+
+func compileDemoRoute(docDir string, components []*Component) error {
+	demoModulesDir := path.Join(docDir, "src", "app", "demo-module")
+	routerPath := path.Join(demoModulesDir, "demo.routes.ts")
+	routeTemplatePath := path.Join("template", "demo-route")
+	routeTemplate, err := util.ReadFile(routeTemplatePath)
+
+	if err != nil {
+		return err
+	}
+
+	routeConfig := &RouteConfig{
+		RouteList: []string{},
+		Imports:   []string{},
+	}
+
+	_ = withRouteConfig(components, "zh", &routeConfig)
+	_ = withRouteConfig(components, "en", &routeConfig)
+
+	routeTemplate = strings.Replace(routeTemplate, "{{imports}}", strings.Join(routeConfig.Imports, "\n"), 1)
+	routeTemplate = strings.Replace(routeTemplate, "{{routes}}", strings.Join(routeConfig.RouteList, ",\n      "), 1)
+	// introduce.routes.ts
+
+	err = util.WriteFile(routerPath, routeTemplate)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CompileDemoDocs(docDir string, components []*Component) error {
+	// 生成路由 没有执行顺序要求
+	compileDemoRouteTask := flows.NewAutoNameTask(func() error {
+		return compileDemoRoute(docDir, components)
+	})
+
+	// 生成布局 没有执行顺序要求
+	compileDemoDocLayoutTask := flows.NewAutoNameTask(func() error {
+		return compileDemoDocLayout(docDir, components, "zh")
+	})
+
+	flows.ParallelTask([]*flows.Task{
+		compileDemoRouteTask,
+		compileDemoDocLayoutTask,
+	})
+
 	return nil
 }
 
@@ -105,6 +279,30 @@ func (receiver *Component) CollectComponents() error {
 	wg.Wait()
 
 	return nil
+}
+
+func (receiver *Component) GenerateRoutePath(lang string) string {
+	lang = strings.Split(lang, "-")[0]
+
+	routePath := fmt.Sprintf(
+		"%s/%s",
+		receiver.Name,
+		lang,
+	)
+
+	return routePath
+}
+
+func (receiver *Component) GenerateComponentName(lang string) string {
+	lang = strings.Split(lang, "-")[0]
+
+	componentName := fmt.Sprintf(
+		"NxDemo%s%sComponent",
+		util.CapitalizeFirstLetter(strings.ReplaceAll(receiver.Name, "-", "")),
+		util.CapitalizeFirstLetter(lang),
+	)
+
+	return componentName
 }
 
 func (receiver *Component) OutputComponent(demoDir, filename string) {
@@ -166,29 +364,33 @@ func (receiver *Component) resolveMd(demoDir, filename string) {
 	receiver.DemoDocuments = append(receiver.DemoDocuments, document)
 }
 
-func (receiver *Component) CopyComponent(demoDir, filename string) error {
-	componentPath := path.Join(demoDir, filename)
+func (receiver *Component) CopyComponent(filename string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	componentPath := path.Join(receiver.DemoDir, filename)
 	targetDir := path.Join(receiver.OutputDir, receiver.Name)
 
 	// 创建目录，如果不存在的话
 	err := os.MkdirAll(targetDir, os.ModePerm)
 	if err != nil {
-		return err
+		fmt.Println("err", err)
+		return
 	}
 
 	err = util.CopyFile(componentPath, path.Join(targetDir, filename))
 	if err != nil {
-		return err
+		fmt.Println("err", err)
+		return
 	}
-
-	return nil
 }
 
-func (receiver *Component) OutputTemplate(demoMetas []*DemoMeta) error {
+func (receiver *Component) OutputTemplate(lang string) error {
 	demoName := receiver.Name
+	demoMetas := receiver.DemoMetas
+
 	var importDepComponentList []string
 	var importComponentList []string
-	componentName := fmt.Sprintf("NxDemo%s%sComponent", util.CapitalizeFirstLetter(demoName), util.CapitalizeFirstLetter("zh"))
+
+	componentName := fmt.Sprintf("NxDemo%s%sComponent", util.CapitalizeFirstLetter(demoName), util.CapitalizeFirstLetter(lang))
 
 	for _, meta := range demoMetas {
 		demoComponentName := fmt.Sprintf("%sComponent", util.CapitalizeFirstLetter(meta.Name))
@@ -211,7 +413,7 @@ func (receiver *Component) OutputTemplate(demoMetas []*DemoMeta) error {
 	targetDir := path.Join(
 		receiver.OutputDir,
 		receiver.Name,
-		"zh.component.ts",
+		fmt.Sprintf("%s.component.ts", lang),
 	)
 
 	err = util.WriteFile(targetDir, template)

@@ -49,6 +49,7 @@ type CompileDocTask struct {
 	CollectGlobalDocsTask    *flows.Task
 	CollectComponentDocsTask *flows.Task
 	GenerateGlobalDocsTask   *flows.Task
+	GenerateDemoDocsTask     *flows.Task
 	GlobalDocs               *generate.GlobalDocs
 	Components               []*generate.Component
 }
@@ -97,6 +98,30 @@ func (receiver *CompileDocTask) generateGlobalDocsTaskHandler() error {
 	return receiver.GlobalDocs.Generate()
 }
 
+func (receiver *CompileDocTask) generateDemoDocsTaskHandler() error {
+	if receiver.Components == nil {
+		return nil
+	}
+
+	flows.ParallelTask([]*flows.Task{
+		flows.NewAutoNameTask(func() error {
+			for _, component := range receiver.Components {
+				err := component.GenerateComponents()
+
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		}),
+		flows.NewAutoNameTask(func() error {
+			return generate.CompileDemoDocs(receiver.DocDir, receiver.Components)
+		}),
+	})
+
+	return nil
+}
+
 func (receiver *CompileDocTask) copyDocProjectTaskHandler() error {
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -118,6 +143,10 @@ func (receiver *CompileDocTask) registrationTask() {
 		receiver.CopyDesignDocTask,
 		receiver.CollectGlobalDocsTask,
 	)
+
+	receiver.GenerateDemoDocsTask = flows.NewTask("生成demo文档", receiver.generateDemoDocsTaskHandler)
+
+	receiver.GenerateDemoDocsTask.SetDependency(receiver.CollectComponentDocsTask)
 }
 
 func (receiver *CompileDocTask) CompileTask() {
@@ -132,6 +161,7 @@ func (receiver *CompileDocTask) CompileTask() {
 func (receiver *CompileDocTask) GenerateTask() {
 	flows.ParallelTask([]*flows.Task{
 		receiver.GenerateGlobalDocsTask,
+		receiver.GenerateDemoDocsTask,
 	})
 }
 

@@ -212,6 +212,7 @@ func (receiver *GlobalDocs) generateDocsLayout() error {
 
 	for _, document := range receiver.Documents {
 		if document.LangSimple != "zh" {
+			// TODO 暂时只生成中文链接
 			continue
 		}
 
