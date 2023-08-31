@@ -59,6 +59,17 @@ type DemoMeta struct {
 	FilePath string
 }
 
+func (receiver *Component) UpdateCodeByPath(codePath string) {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go receiver.CopyComponent(filepath.Base(codePath), &wg)
+	wg.Wait()
+}
+
+func (receiver *Component) UpdateByPath(codePath string) {
+
+}
+
 func (receiver *Component) copyDemoComponents() {
 	var wg sync.WaitGroup
 
