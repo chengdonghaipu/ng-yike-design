@@ -44,6 +44,7 @@ type ApiDocument struct {
 	Api         string // Api章节的所有内容 并转换为HTML
 	Language    string // 默认 zhCN 根据文件名称来定的
 	Description string // 组件描述 也就是这部分“按钮用于开始一个即时操作。” 并转换为HTML
+	FilePath    string
 }
 
 func ParseApiDocument(filePath string) (*ApiDocument, error) {
@@ -71,6 +72,7 @@ func ParseApiDocument(filePath string) (*ApiDocument, error) {
 	fileNameWithExt := filepath.Base(filePath)
 	apiDoc.Language = strings.TrimSuffix(fileNameWithExt, filepath.Ext(fileNameWithExt))
 	apiDoc.Metadata = metadata
+	apiDoc.FilePath = filePath
 
 	languageToTitle := map[string]map[string]string{
 		"zh-CN": {

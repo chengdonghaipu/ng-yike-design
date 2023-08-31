@@ -87,11 +87,11 @@ func (receiver *CompileDocTask) UpdateByPath(mdPath string) {
   isDemoCodeChange := isDemoChange && filepath.Ext(mdPath) == ".ts"
   isDemoDocChange := isDemoChange && filepath.Ext(mdPath) == ".md"
 
-  if isDemoChange {
-    component := util.NewSliceHelper(receiver.Components).Find(func(component *generate.Component) bool {
-      return strings.Contains(mdPath, component.ComponentDir)
-    })
+  component := util.NewSliceHelper(receiver.Components).Find(func(component *generate.Component) bool {
+    return strings.Contains(mdPath, component.ComponentDir)
+  })
 
+  if isDemoChange {
     if component == nil {
       return
     }
@@ -107,6 +107,19 @@ func (receiver *CompileDocTask) UpdateByPath(mdPath string) {
     }
 
     return
+  }
+
+  isDemoApiDocChange := strings.Contains(mdPath, receiver.ComponentsDir) &&
+    strings.Contains(strings.Replace(mdPath, receiver.ComponentsDir, "", 1), "doc")
+
+  if isDemoApiDocChange {
+    if component == nil {
+      return
+    }
+
+    util.MeasureTime(fmt.Sprintf("[WATCHING][DEMO API DOC UPDATE] %s", mdPath), func() {
+      component.UpdateApiDocByPath(mdPath)
+    })
   }
 }
 
