@@ -85,9 +85,9 @@ func (receiver *CompileDocTask) UpdateByPath(mdPath string) {
     strings.Contains(strings.Replace(mdPath, receiver.ComponentsDir, "", 1), "demo")
 
   isDemoCodeChange := isDemoChange && filepath.Ext(mdPath) == ".ts"
-  //isDemoDocChange := isDemoChange && filepath.Ext(mdPath) == ".md"
+  isDemoDocChange := isDemoChange && filepath.Ext(mdPath) == ".md"
 
-  if isDemoCodeChange {
+  if isDemoChange {
     component := util.NewSliceHelper(receiver.Components).Find(func(component *generate.Component) bool {
       return strings.Contains(mdPath, component.ComponentDir)
     })
@@ -96,9 +96,16 @@ func (receiver *CompileDocTask) UpdateByPath(mdPath string) {
       return
     }
 
-    util.MeasureTime(fmt.Sprintf("[WATCHING][CODE UPDATE] %s", mdPath), func() {
-      component.UpdateCodeByPath(mdPath)
-    })
+    if isDemoCodeChange {
+      util.MeasureTime(fmt.Sprintf("[WATCHING][DEMO CODE UPDATE] %s", mdPath), func() {
+        component.UpdateCodeByPath(mdPath)
+      })
+    } else if isDemoDocChange {
+      util.MeasureTime(fmt.Sprintf("[WATCHING][DEMO DOC UPDATE] %s", mdPath), func() {
+        component.UpdateDocByPath(mdPath)
+      })
+    }
+
     return
   }
 }
