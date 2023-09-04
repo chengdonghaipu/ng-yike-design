@@ -1,0 +1,17 @@
+@use "../common/global-config" as gf;
+
+@function genVarName($list) {
+  $name: '--' + gf.$namespace;
+
+  @each $item in $list {
+    @if $item != '' {
+      $name: $name + '-' + $item;
+    }
+  }
+
+  @return $name;
+}
+
+@function getCssVarName($args...) {
+  @return genVarName($args);
+}
