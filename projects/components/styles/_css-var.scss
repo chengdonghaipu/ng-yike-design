@@ -1,0 +1,37 @@
+@use 'sass:map';
+@use "common/global-config" as gf;
+@use "mixins/css-var-mixin" as *;
+@use "common/base" as b;
+@use "common/var" as var;
+
+#{unquote(gf.$root-selector)} {
+    @include set-css-var-value('color-white', var.$color-white);
+    @include set-css-var-value('color-black', var.$color-black);
+
+    @each $type in b.$types {
+        @include set-css-color-rgb(var.$colors, $type)
+    }
+
+    @include set-map-css-var('font-size', var.$font-size);
+    @include set-map-css-var('font-family', var.$font-family);
+    @include set-map-css-var('line-height', var.$line-height);
+
+    @include set-css-var-value('font-weight-primary', var.$font-weight-primary);
+    @include set-css-var-value('font-line-height-primary', map.get(var.$line-height, 'text-m'));
+
+    @include set-map-css-var('z-index', var.$z-index);
+    @include set-map-css-var('border-radius', var.$border-radius);
+    // border-radius
+}
+
+#{unquote(gf.$root-selector)} {
+    color-scheme: light;
+
+    @each $type in b.$types {
+        @include set-css-color-type(var.$colors, $type)
+    }
+
+    @include set-map-css-var('bg-color', var.$bg-color);
+    @include set-map-css-var('text-color', var.$text-color);
+    @include set-map-css-var('border-color', var.$border-color);
+}

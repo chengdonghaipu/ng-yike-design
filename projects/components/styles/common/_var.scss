@@ -1,0 +1,167 @@
+@use 'sass:map';
+@use 'sass:math';
+@use "base" as b;
+
+$colors: () !default;
+$colors: map.deep-merge(
+  (
+    'white': #ffffff,
+    'black': #000000,
+    'primary': (
+      'base': #2B5AED,
+    ),
+    'success': (
+      'base': #1FB4A2,
+    ),
+    'warning': (
+      'base': #FFAA1A,
+    ),
+    'danger': (
+      'base': #FA5247,
+    ),
+    'error': (
+      'base': #FA5247,
+    ),
+    'info': (
+      'base': #1E20257A,
+    ),
+  ),
+  $colors
+);
+
+$color-white: map.get($colors, 'white') !default;
+$color-black: map.get($colors, 'black') !default;
+$color-primary: map.get($colors, 'primary', 'base') !default;
+$color-success: map.get($colors, 'success', 'base') !default;
+$color-warning: map.get($colors, 'warning', 'base') !default;
+$color-danger: map.get($colors, 'danger', 'base') !default;
+$color-error: map.get($colors, 'error', 'base') !default;
+$color-info: map.get($colors, 'info', 'base') !default;
+
+$font-weight-primary: 400 !default;
+
+@mixin set-color-mix-level(
+  $type,
+  $number,
+  $mode: 'light',
+  $mix-color: $color-white
+) {
+  $colors: map.deep-merge(
+    (
+      $type: (
+        '#{$mode}-#{$number}':
+          mix(
+            $mix-color,
+            map.get($colors, $type, 'base'),
+            math.percentage(math.div($number, 10))
+          ),
+      ),
+    ),
+    $colors
+  ) !global;
+}
+
+@each $type in b.$types {
+  @for $i from 1 through 9 {
+    @include set-color-mix-level($type, $i, 'light', $color-white);
+  }
+}
+
+
+@each $type in b.$types {
+  @include set-color-mix-level($type, 2, 'dark', $color-black);
+}
+
+$font-family: () !default;
+$font-family: map.merge(
+    (
+      '':
+      "'PingFang SC', 'Helvetica Neue', Helvetica, 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif"
+    ),
+    $font-family
+);
+
+$font-size: () !default;
+$font-size: map.merge(
+    (
+      'title-l': 32px,
+      'title-m': 24px,
+      'title-s': 28px,
+      'text-l': 16px,
+      'text-m': 14px,
+      'text-s': 12px,
+    ),
+    $font-size
+);
+
+$line-height: () !default;
+$line-height: map.merge(
+    (
+      'title-l': 46px,
+      'title-m': 36px,
+      'title-s': 26px,
+      'text-l': 24px,
+      'text-m': 22px,
+      'text-s': 18px,
+    ),
+    $font-size
+);
+
+$z-index: () !default;
+$z-index: map.merge(
+    (
+      'normal': 1,
+      'popover': 1000,
+      'dialog': 2000,
+    ),
+    $z-index
+);
+
+$border-radius-base: 4px;
+
+$border-radius: () !default;
+$border-radius: map.merge(
+    (
+      'base': $border-radius-base,
+      'radius-m': 8px,
+      'radius-l': 12px,
+      'radius-xl': 16px,
+      'circle': 100%,
+    ),
+    $border-radius
+);
+
+$bg-color: () !default;
+$bg-color: map.merge(
+  (
+    '': #ffffff,
+    'page': #f2f3f5,
+    'popover': #ffffff,
+  ),
+  $bg-color
+);
+
+$text-color: () !default;
+$text-color: map.merge(
+  (
+    'primary': #303133,
+    'regular': #606266,
+    'secondary': #909399,
+    'placeholder': #a8abb2,
+    'disabled': #c0c4cc,
+  ),
+  $text-color
+);
+
+$border-color: () !default;
+$border-color: map.merge(
+  (
+    '': #dcdfe6,
+    'light': #e4e7ed,
+    'lighter': #ebeef5,
+    'extra-light': #f2f6fc,
+    'dark': #d4d7de,
+    'darker': #cdd0d6,
+  ),
+  $border-color
+);
