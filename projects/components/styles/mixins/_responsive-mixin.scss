@@ -1,0 +1,50 @@
+@use 'sass:map';
+@use 'sass:math';
+@use "../common/global-config" as gf;
+@use '../common/base' as *;
+
+
+@mixin responsive($key, $map: $breakpoints) {
+  @if map-has-key($map, $key) {
+    @media only screen and #{unquote(map-get($map, $key))} {
+      @content;
+    }
+  } @else {
+    @warn "Undefined points: `#{$map}`";
+  }
+}
+
+@mixin col-size($breakpoint) {
+  $namespace: gf.$namespace;
+  @include responsive($breakpoint) {
+    //.#{$namespace}-col-#{$breakpoint}-0 {
+    //  display: none;
+    //  @include when(guttered) {
+    //    display: none;
+    //  }
+    //}
+    @for $i from 0 through 24 {
+      .#{$namespace}-col-#{$breakpoint}-#{$i} {
+        @if $i != 0 {
+          display: block;
+        }
+        max-width: (math.div(1, $grid-columns) * $i * 100) * 1%;
+        flex: 0 0 (math.div(1, $grid-columns) * $i * 100) * 1%;
+      }
+
+      .#{$namespace}-col-#{$breakpoint}-offset-#{$i} {
+        margin-left: (math.div(1, $grid-columns) * $i * 100) * 1%;
+      }
+
+      .#{$namespace}-col-#{$breakpoint}-pull-#{$i} {
+        position: relative;
+        right: (math.div(1, $grid-columns) * $i * 100) * 1%;
+      }
+
+      .#{$namespace}-col-#{$breakpoint}-push-#{$i} {
+        position: relative;
+        left: (math.div(1, $grid-columns) * $i * 100) * 1%;
+      }
+    }
+  }
+}
