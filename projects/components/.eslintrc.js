@@ -44,6 +44,26 @@ module.exports = {
     {
       files: ['*.html'],
       rules: {}
+    },
+    {
+      files: ['**/demo/*.ts', '*.spec.ts'],
+      rules: {
+        '@angular-eslint/directive-selector': [
+          'error',
+          {
+            type: 'attribute',
+            prefix: ['app']
+          }
+        ],
+        '@angular-eslint/component-selector': [
+          'error',
+          {
+            type: ['element', 'attribute'],
+            prefix: ['app', 'test'],
+            style: 'kebab-case'
+          }
+        ],
+      }
     }
   ]
 };

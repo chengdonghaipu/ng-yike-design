@@ -43,3 +43,5 @@ Thumbs.db
 
 .eslintcache
 /projects/design-doc/
+/projects/junit/
+/projects/coverage-report/

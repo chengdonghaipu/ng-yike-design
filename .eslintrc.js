@@ -136,7 +136,7 @@ module.exports = {
                 position: 'before'
               },
               {
-                pattern: 'ng-zorro-antd/**',
+                pattern: 'ng-yike-design/**',
                 group: 'internal',
                 position: 'before'
               }
@@ -162,7 +162,7 @@ module.exports = {
     {
       files: ['**/demo/*.ts', '*.spec.ts'],
       rules: {
-        'header/header': 'off'
+        'header/header': 'off',
       }
     },
     {

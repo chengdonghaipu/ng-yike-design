@@ -6,7 +6,7 @@
     "components": {
       "projectType": "library",
       "root": "projects/components",
-      "sourceRoot": "projects/components/src",
+      "sourceRoot": "projects/components",
       "prefix": "nx",
       "architect": {
         "build": {
@@ -31,8 +31,10 @@
             "polyfills": [
               "zone.js",
               "zone.js/testing"
-            ]
+            ],
+            "karmaConfig": "projects/components/karma.conf.js"
           }
+
         }
       }
     },
