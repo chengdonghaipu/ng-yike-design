@@ -1,8 +1,8 @@
 @use 'sass:map';
-@use "common/global-config" as gf;
+@use "variable/global-config" as gf;
 @use "mixins/css-var-mixin" as *;
-@use "common/base" as b;
-@use "common/var" as var;
+@use "variable/base" as b;
+@use "variable/var" as var;
 
 #{unquote(gf.$root-selector)} {
     @include set-css-var-value('color-white', var.$color-white);

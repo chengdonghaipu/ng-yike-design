@@ -1,4 +1,4 @@
-@use "../common/global-config" as gf;
+@use "../variable/global-config" as gf;
 
 @function genVarName($list) {
   $name: '--' + gf.$namespace;

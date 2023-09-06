@@ -1,7 +1,7 @@
 @use 'sass:map';
 @use 'sass:math';
-@use "../common/global-config" as gf;
-@use '../common/base' as *;
+@use "../variable/global-config" as gf;
+@use '../variable/base' as *;
 
 
 @mixin responsive($key, $map: $breakpoints) {
