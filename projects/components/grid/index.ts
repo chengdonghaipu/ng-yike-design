@@ -3,4 +3,5 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-export * from './index';
+export * from './col.directive';
+export * from './row.directive';
