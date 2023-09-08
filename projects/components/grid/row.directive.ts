@@ -3,30 +3,37 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import { Directive, ElementRef, HostBinding, inject, Input, Renderer2 } from '@angular/core';
+import { Directive, Input, numberAttribute } from '@angular/core';
+import { ReplaySubject } from 'rxjs';
 
-import { TypeObject } from 'ng-yk-design/core';
+import { TypeObject, useHostDom } from 'ng-yk-design/core';
 
-import { AlignItems, JustifyContent } from './types';
+import { AlignItems, FlexDirection, JustifyContent } from './types';
 
 @Directive({
   selector: '[nxRow], nx-row',
   exportAs: 'nxRow',
   standalone: true,
   host: {
-    class: 'yk-row'
+    class: 'yk-flex-row'
   }
 })
 export class NxRowDirective {
-  private readonly renderer = inject(Renderer2);
-  private readonly elementRef: ElementRef<HTMLElement> = inject(ElementRef);
-  private get element(): HTMLElement {
-    return this.elementRef.nativeElement;
+  private readonly hostDom = useHostDom();
+  gutter$ = new ReplaySubject<[number, number]>(1);
+  @Input() set nxGutter(value: number | [number, number]) {
+    if (Array.isArray(value)) {
+      this.gutter$.next(value);
+      return;
+    }
+
+    const gutter = numberAttribute(value);
+    this.gutter$.next([gutter, 0]);
   }
 
-  @Input() set nxJustify(type: JustifyContent | null) {
-    if (type === null) {
-      this.renderer.removeStyle(this.element, 'justify-content');
+  @Input() set nxJustify(value: JustifyContent | null) {
+    if (value === null) {
+      this.hostDom.removeStyle('justifyContent');
       return;
     }
 
@@ -34,19 +41,29 @@ export class NxRowDirective {
       start: 'flex-start',
       end: 'flex-end',
       between: 'space-between',
-      around: 'space-around'
+      around: 'space-around',
+      evenly: 'space-evenly'
     };
 
-    this.renderer.setStyle(this.element, 'justify-content', flexMap[type] ?? type);
+    this.hostDom.setHostStyle('justifyContent', flexMap[value] ?? value);
   }
 
-  @Input() set nxAlign(type: AlignItems | null) {
-    if (type === null) {
-      this.renderer.removeStyle(this.element, 'align-items');
+  @Input() set nxAlign(value: AlignItems | null) {
+    if (value === null) {
+      this.hostDom.removeStyle('alignItems');
       return;
     }
 
     const flexMap: TypeObject<string> = { start: 'flex-start', end: 'flex-end' };
-    this.renderer.setStyle(this.element, 'align-items', flexMap[type] ?? type);
+    this.hostDom.setHostStyle('alignItems', flexMap[value] ?? value);
+  }
+
+  @Input() set nxDirection(value: FlexDirection | null) {
+    if (value === null) {
+      this.hostDom.removeStyle('flexDirection');
+      return;
+    }
+
+    this.hostDom.setHostStyle('flexDirection', value);
   }
 }

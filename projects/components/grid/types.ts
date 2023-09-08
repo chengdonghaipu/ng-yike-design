@@ -5,4 +5,6 @@
 
 export type AlignItems = 'start' | 'end' | 'center' | 'baseline' | 'stretch';
 
-export type JustifyContent = 'start' | 'end' | 'center' | 'between' | 'around';
+export type JustifyContent = 'start' | 'end' | 'center' | 'between' | 'around' | 'evenly';
+
+export type FlexDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';

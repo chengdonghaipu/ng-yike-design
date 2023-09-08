@@ -26,7 +26,7 @@ describe('RowDirective', () => {
   });
 
   it('should apply host classname', () => {
-    expect(rowElement.className).toContain('yk-row');
+    expect(rowElement.className).toContain('yk-flex-row');
   });
 
   it('should apply align-items start styles', () => {
@@ -87,6 +87,12 @@ describe('RowDirective', () => {
     fixture.componentInstance.justify = 'around';
     fixture.detectChanges();
     expect(rowElement.style.cssText).toContain('justify-content: space-around;');
+  });
+
+  it('should apply justify-content space-evenly styles', () => {
+    fixture.componentInstance.justify = 'evenly';
+    fixture.detectChanges();
+    expect(rowElement.style.cssText).toContain('justify-content: space-evenly;');
   });
 
   it('should apply clear justify-content styles', () => {
