@@ -3,9 +3,6 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type SafaAny = any;
-
-export interface TypeObject<T> {
-  [key: string]: T;
+export function toHyphenCase(camelCase: string): string {
+  return camelCase.replace(/([A-Z])/g, '-$1').toLowerCase();
 }
