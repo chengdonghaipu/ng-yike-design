@@ -3,12 +3,15 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/app",
-    "types": []
+    "baseUrl": "./",
+    "module": "es2020",
+    "types": [],
+    "paths": {
+      "ng-yk-design/*": ["../components/*"]
+    }
   },
-  "files": [
-    "src/main.ts"
-  ],
-  "include": [
-    "src/**/*.d.ts"
+  "exclude": [
+    "test.ts",
+    "**/*.spec.ts"
   ]
 }

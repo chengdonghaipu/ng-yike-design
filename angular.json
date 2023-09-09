@@ -93,6 +93,7 @@
               "projects/design-doc/src/manifest.webmanifest"
             ],
             "styles": [
+              "projects/design-doc/src/styles.scss",
               "projects/design-doc/src/styles.less"
             ],
             "scripts": [],

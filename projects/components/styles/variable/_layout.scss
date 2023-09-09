@@ -27,6 +27,13 @@
   }
 }
 
+.#{gf.$namespace}-flex-row {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  box-sizing: border-box;
+}
+
 @include col-size(xs);
 
 @include col-size(sm);
