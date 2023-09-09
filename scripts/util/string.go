@@ -1,6 +1,7 @@
 package util
 
 import (
+	"os"
 	"strings"
 	"unicode"
 )
@@ -17,4 +18,13 @@ func CapitalizeFirstLetter(input string) string {
 	builder.WriteString(input[1:])
 
 	return builder.String()
+}
+
+func ReplacePathSeparator(inputPath string) string {
+	old := "\\"
+
+	if string(os.PathSeparator) == "\\" {
+		old = "/"
+	}
+	return strings.ReplaceAll(inputPath, old, string(os.PathSeparator))
 }
