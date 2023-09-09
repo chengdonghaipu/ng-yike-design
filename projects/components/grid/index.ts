@@ -7,11 +7,11 @@ import { Type } from '@angular/core';
 
 import { SafaAny } from 'ng-yk-design/core';
 
-import { ColDirective } from './col.directive';
+import { NxColDirective } from './col.directive';
 import { NxRowDirective } from './row.directive';
 
 export const provideFlexLayoutModule = (): Array<Type<SafaAny>> => {
-  return [ColDirective, NxRowDirective];
+  return [NxColDirective, NxRowDirective];
 };
 
-export { ColDirective, NxRowDirective };
+export { NxColDirective, NxRowDirective };
