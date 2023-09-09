@@ -18,6 +18,8 @@ export interface HostDom {
   setHostStyles(css: Partial<CSSStyleDeclaration>): void;
 
   removeStyle<K extends keyof CSSStyleDeclaration>(style: K): void;
+
+  addClass(name: string): void;
 }
 
 export function useHostDom(): HostDom {
@@ -37,10 +39,15 @@ export function useHostDom(): HostDom {
     renderer.removeStyle(element(), toHyphenCase(style as string));
   }
 
+  function addClass(name: string): void {
+    renderer.addClass(element(), name);
+  }
+
   return {
     setHostStyle,
     setHostStyles,
     removeStyle,
+    addClass,
     renderer,
     elementRef,
     element

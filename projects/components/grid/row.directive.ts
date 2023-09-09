@@ -20,7 +20,8 @@ import { AlignItems, FlexDirection, JustifyContent } from './types';
 })
 export class NxRowDirective {
   private readonly hostDom = useHostDom();
-  gutter$ = new ReplaySubject<[number, number]>(1);
+  readonly gutter$ = new ReplaySubject<[number, number]>(1);
+  @Input({ transform: numberAttribute }) nxColumns: number = 24;
   @Input() set nxGutter(value: number | [number, number]) {
     if (Array.isArray(value)) {
       this.gutter$.next(value);
