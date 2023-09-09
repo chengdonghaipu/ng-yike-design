@@ -78,15 +78,23 @@ function useUpdateHostStyles(hostDom: HostDom): Partial<UpdateHostStylesReturn> 
     });
   }
 
-  rowDirective.gutter$.pipe(takeUntilDestroyed()).subscribe(([mainAxis, crossAxis]) => {
-    if (crossAxis === 0) {
-      hostDom.setHostStyle('paddingLeft', `${mainAxis}px`);
-      hostDom.setHostStyle('paddingRight', `${mainAxis}px`);
-      return;
-    }
+  toObservable(rowDirective.gutter)
+    .pipe(takeUntilDestroyed())
+    .subscribe(([mainAxis, crossAxis]) => {
+      if (crossAxis === 0) {
+        if (!mainAxis) {
+          hostDom.removeStyle('paddingLeft');
+          hostDom.removeStyle('paddingRight');
+          return;
+        }
 
-    hostDom.setHostStyle('padding', `${mainAxis}px ${crossAxis}px`);
-  });
+        hostDom.setHostStyle('paddingLeft', `${mainAxis}px`);
+        hostDom.setHostStyle('paddingRight', `${mainAxis}px`);
+        return;
+      }
+
+      hostDom.setHostStyle('padding', `${mainAxis}px ${crossAxis}px`);
+    });
 
   const inputsName = Object.keys(inputsMap);
 

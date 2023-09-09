@@ -3,7 +3,7 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import { Directive, Input, numberAttribute } from '@angular/core';
+import { Directive, Input, numberAttribute, signal } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 
 import { TypeObject, useHostDom } from 'ng-yk-design/core';
@@ -20,16 +20,19 @@ import { AlignItems, FlexDirection, JustifyContent } from './types';
 })
 export class NxRowDirective {
   private readonly hostDom = useHostDom();
-  readonly gutter$ = new ReplaySubject<[number, number]>(1);
-  @Input({ transform: numberAttribute }) nxColumns: number = 24;
+  readonly gutter = signal<[number, number]>([0, 0]);
+  readonly columns = signal(24);
+  @Input({ transform: numberAttribute }) set nxColumns(value: number) {
+    this.columns.set(value);
+  }
   @Input() set nxGutter(value: number | [number, number]) {
     if (Array.isArray(value)) {
-      this.gutter$.next(value);
+      this.gutter.set(value);
       return;
     }
 
     const gutter = numberAttribute(value);
-    this.gutter$.next([gutter, 0]);
+    this.gutter.set([gutter, 0]);
   }
 
   @Input() set nxJustify(value: JustifyContent | null) {
