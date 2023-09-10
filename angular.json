@@ -8,6 +8,11 @@
       "root": "projects/components",
       "sourceRoot": "projects/components",
       "prefix": "nx",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",

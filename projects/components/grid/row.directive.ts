@@ -7,7 +7,7 @@ import { booleanAttribute, Directive, Input, numberAttribute, OnChanges, signal,
 
 import { HostDom, TypeObject, useHostDom } from 'ng-yk-design/core';
 
-import { AlignItems, FlexDirection, JustifyContent } from './types';
+import { AlignItems, FlexDirection, FlexFlow, JustifyContent } from './types';
 
 @Directive()
 class RowInputs {
@@ -72,6 +72,15 @@ export class NxRowDirective extends RowInputs implements OnChanges {
 
     const gutter = numberAttribute(value);
     this.gutter.set([gutter, 0]);
+  }
+
+  @Input('flex.flow') set flexFlow(value: FlexFlow | null) {
+    if (value === null) {
+      this.hostDom.removeStyle('flexFlow');
+      return;
+    }
+
+    this.hostDom.setHostStyle('flexFlow', value);
   }
 
   @Input() set nxJustify(value: JustifyContent | null) {

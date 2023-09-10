@@ -8,3 +8,15 @@ export type AlignItems = 'start' | 'end' | 'center' | 'baseline' | 'stretch';
 export type JustifyContent = 'start' | 'end' | 'center' | 'between' | 'around' | 'evenly';
 
 export type FlexDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
+
+export type FlexFlow =
+  | FlexDirection
+  | 'nowrap'
+  | 'wrap'
+  | 'wrap-reverse'
+  | 'row nowrap'
+  | 'row wrap'
+  | 'row wrap-reverse'
+  | 'column nowrap'
+  | 'column wrap'
+  | 'column wrap-reverse';
