@@ -3,11 +3,23 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import { computed, Directive, inject, numberAttribute, OnChanges, OnInit, Signal, SimpleChanges } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import {
+  booleanAttribute,
+  computed,
+  Directive,
+  inject,
+  Input,
+  numberAttribute,
+  OnChanges,
+  OnInit,
+  Signal,
+  SimpleChanges
+} from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { skip } from 'rxjs';
 
 import { HostDom, SafaAny, useHostDom } from 'ng-yk-design/core';
+import { hiddenInputs } from 'ng-yk-design/grid/use-hidden';
 
 import { NxRowDirective } from './row.directive';
 
@@ -78,23 +90,21 @@ function useUpdateHostStyles(hostDom: HostDom): Partial<UpdateHostStylesReturn> 
     });
   }
 
-  toObservable(rowDirective.gutter)
-    .pipe(takeUntilDestroyed())
-    .subscribe(([mainAxis, crossAxis]) => {
-      if (crossAxis === 0) {
-        if (!mainAxis) {
-          hostDom.removeStyle('paddingLeft');
-          hostDom.removeStyle('paddingRight');
-          return;
-        }
-
-        hostDom.setHostStyle('paddingLeft', `${mainAxis}px`);
-        hostDom.setHostStyle('paddingRight', `${mainAxis}px`);
+  toObservable(rowDirective.gutter).subscribe(([mainAxis, crossAxis]) => {
+    if (crossAxis === 0) {
+      if (!mainAxis) {
+        hostDom.removeStyle('paddingLeft');
+        hostDom.removeStyle('paddingRight');
         return;
       }
 
-      hostDom.setHostStyle('padding', `${mainAxis}px ${crossAxis}px`);
-    });
+      hostDom.setHostStyle('paddingLeft', `${mainAxis}px`);
+      hostDom.setHostStyle('paddingRight', `${mainAxis}px`);
+      return;
+    }
+
+    hostDom.setHostStyle('padding', `${mainAxis}px ${crossAxis}px`);
+  });
 
   const inputsName = Object.keys(inputsMap);
 
@@ -117,20 +127,26 @@ function useUpdateHostStyles(hostDom: HostDom): Partial<UpdateHostStylesReturn> 
   };
 }
 
+@Directive()
+class ColInputs {
+  @Input({ transform: numberAttribute }) nxSpan!: number | string;
+  @Input({ transform: numberAttribute }) nxOffset!: number | string;
+  @Input({ transform: numberAttribute }) nxPull!: number | string;
+  @Input({ transform: numberAttribute }) nxPush!: number | string;
+}
+
 @Directive({
   selector: '[nxCol], nx-col',
   standalone: true,
   host: {
     class: 'yk-flex-col'
-  },
-  // eslint-disable-next-line @angular-eslint/no-inputs-metadata-property
-  inputs: ['nxSpan', 'nxOffset', 'nxPull', 'nxPush']
+  }
 })
-export class NxColDirective implements OnChanges, OnInit {
+export class NxColDirective extends ColInputs implements OnChanges, OnInit {
   private readonly hostDom = useHostDom();
   private readonly updateHostStyles = useUpdateHostStyles(this.hostDom);
   private readonly columns = computed(() => this.updateHostStyles.columns?.() || 24);
-  private readonly columns$ = toObservable(this.columns).pipe(takeUntilDestroyed(), skip(1));
+  private readonly columns$ = toObservable(this.columns).pipe(skip(1));
 
   ngOnChanges(changes: SimpleChanges): void {
     this.updateHostStyles.ngOnChanges?.(changes);
