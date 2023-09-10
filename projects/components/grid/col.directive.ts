@@ -68,7 +68,7 @@ const inputsMap = {
 };
 
 function useUpdateHostStyles(hostDom: HostDom): Partial<UpdateHostStylesReturn> {
-  const rowDirective = inject(NxRowDirective, { optional: true });
+  const rowDirective = inject(NxRowDirective, { optional: true, host: true, skipSelf: true });
 
   if (!rowDirective) {
     return {};
@@ -134,7 +134,7 @@ class ColInputs {
 }
 
 @Directive({
-  selector: '[nxCol]:not([nxRow]):not(nx-row), nx-col:not([nxRow]):not(nx-row)',
+  selector: '[nxCol], nx-col',
   standalone: true,
   host: {
     class: 'yk-flex-col'

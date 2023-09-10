@@ -3,19 +3,9 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import {
-  booleanAttribute,
-  Directive,
-  Input,
-  numberAttribute,
-  OnChanges,
-  OnInit,
-  signal,
-  SimpleChanges
-} from '@angular/core';
+import { booleanAttribute, Directive, Input, numberAttribute, OnChanges, signal, SimpleChanges } from '@angular/core';
 
 import { HostDom, TypeObject, useHostDom } from 'ng-yk-design/core';
-import { useResize } from 'ng-yk-design/core/util';
 
 import { AlignItems, FlexDirection, JustifyContent } from './types';
 
