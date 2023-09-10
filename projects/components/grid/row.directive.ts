@@ -3,10 +3,10 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import { Directive, Input, numberAttribute, signal } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
+import { Directive, Input, numberAttribute, OnInit, signal } from '@angular/core';
 
 import { TypeObject, useHostDom } from 'ng-yk-design/core';
+import { useBreakpoint, useResize } from 'ng-yk-design/core/util';
 
 import { AlignItems, FlexDirection, JustifyContent } from './types';
 
@@ -18,10 +18,12 @@ import { AlignItems, FlexDirection, JustifyContent } from './types';
     class: 'yk-flex-row'
   }
 })
-export class NxRowDirective {
+export class NxRowDirective implements OnInit {
   private readonly hostDom = useHostDom();
   readonly gutter = signal<[number, number]>([0, 0]);
   readonly columns = signal(24);
+  private readonly resize = useResize();
+
   @Input({ transform: numberAttribute }) set nxColumns(value: number) {
     this.columns.set(value);
   }
@@ -69,5 +71,11 @@ export class NxRowDirective {
     }
 
     this.hostDom.setHostStyle('flexDirection', value);
+  }
+
+  ngOnInit(): void {
+    this.resize.subscribe(() => {
+      console.log(1);
+    });
   }
 }
