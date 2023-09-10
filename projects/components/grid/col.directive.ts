@@ -4,7 +4,6 @@
  */
 
 import {
-  booleanAttribute,
   computed,
   Directive,
   inject,
@@ -135,7 +134,7 @@ class ColInputs {
 }
 
 @Directive({
-  selector: '[nxCol], nx-col',
+  selector: '[nxCol]:not([nxRow]):not(nx-row), nx-col:not([nxRow]):not(nx-row)',
   standalone: true,
   host: {
     class: 'yk-flex-col'

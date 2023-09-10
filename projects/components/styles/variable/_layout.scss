@@ -34,12 +34,16 @@
   box-sizing: border-box;
 }
 
+.#{gf.$namespace}-flex-hidden {
+  display: none;
+}
+
 @include col-size(xs);
 
-@include col-size(sm);
-
-@include col-size(md);
-
-@include col-size(lg);
-
-@include col-size(xl);
+//@include col-size(sm);
+//
+//@include col-size(md);
+//
+//@include col-size(lg);
+//
+//@include col-size(xl);

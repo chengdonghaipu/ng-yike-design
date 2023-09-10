@@ -7,7 +7,7 @@
     "module": "es2020",
     "types": [],
     "paths": {
-      "ng-yk-design/*": ["../components/*"]
+      "ng-yk-design/*": ["../components/*", "../../projects/components/*"]
     }
   },
   "exclude": [

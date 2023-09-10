@@ -3,22 +3,10 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import { J } from '@angular/cdk/keycodes';
 import { BreakpointObserver, BreakpointState, MediaMatcher } from '@angular/cdk/layout';
 import { inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  auditTime,
-  distinctUntilChanged,
-  filter,
-  finalize,
-  map,
-  Observable,
-  of,
-  startWith,
-  Subject,
-  throttleTime
-} from 'rxjs';
+import { filter, finalize, map, Observable, startWith, Subject } from 'rxjs';
 
 import { TypeObject } from 'ng-yk-design/core';
 
@@ -126,10 +114,6 @@ export function useBreakpoint(): UseBreakpointReturn {
       callback(translate[key], value);
     }
   }
-
-  // observer.subscribe().subscribe(value => {
-  //   console.log(value);
-  // });
 
   return {
     translate,
