@@ -19,7 +19,6 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { skip } from 'rxjs';
 
 import { HostDom, SafaAny, useHostDom } from 'ng-yk-design/core';
-import { hiddenInputs } from 'ng-yk-design/grid/use-hidden';
 
 import { NxRowDirective } from './row.directive';
 

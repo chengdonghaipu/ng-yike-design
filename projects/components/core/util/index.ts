@@ -7,3 +7,5 @@ export * from './resize';
 export function toHyphenCase(camelCase: string): string {
   return camelCase.replace(/([A-Z])/g, '-$1').toLowerCase();
 }
+
+export * from './breakpoint';

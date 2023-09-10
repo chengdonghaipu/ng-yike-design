@@ -3,15 +3,10 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import { Type } from '@angular/core';
-
-import { SafaAny } from 'ng-yk-design/core';
-
 import { NxColDirective } from './col.directive';
+import { NxHiddenDirective } from './hidden.directive';
 import { NxRowDirective } from './row.directive';
 
-export const provideFlexLayoutModule = (): Array<Type<SafaAny>> => {
-  return [NxColDirective, NxRowDirective];
-};
+export const NxFlexLayoutModule = [NxColDirective, NxRowDirective, NxHiddenDirective];
 
-export { NxColDirective, NxRowDirective };
+export { NxColDirective, NxRowDirective, NxHiddenDirective };

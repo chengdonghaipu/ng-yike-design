@@ -19,7 +19,12 @@ export interface HostDom {
 
   removeStyle<K extends keyof CSSStyleDeclaration>(style: K): void;
 
+  getHostStyle<K extends keyof CSSStyleDeclaration>(style: K): string;
+
   addClass(name: string): void;
+
+  removeClass(name: string): void;
+  hasClass(name: string): boolean;
 }
 
 export function useHostDom(): HostDom {
@@ -29,6 +34,10 @@ export function useHostDom(): HostDom {
 
   function setHostStyle<K extends keyof CSSStyleDeclaration>(style: K, value: SafaAny): void {
     renderer.setStyle(element(), toHyphenCase(style as string), value);
+  }
+
+  function getHostStyle<K extends keyof CSSStyleDeclaration>(style: K): string {
+    return (element()?.style[style] as string) ?? '';
   }
 
   function setHostStyles(css: Partial<CSSStyleDeclaration>): void {
@@ -43,11 +52,22 @@ export function useHostDom(): HostDom {
     renderer.addClass(element(), name);
   }
 
+  function removeClass(name: string): void {
+    renderer.removeClass(element(), name);
+  }
+
+  function hasClass(name: string): boolean {
+    return element()?.classList.contains(name);
+  }
+
   return {
     setHostStyle,
     setHostStyles,
     removeStyle,
+    getHostStyle,
     addClass,
+    hasClass,
+    removeClass,
     renderer,
     elementRef,
     element
