@@ -24,6 +24,7 @@ export interface HostDom {
   addClass(name: string): void;
 
   removeClass(name: string): void;
+
   hasClass(name: string): boolean;
 }
 

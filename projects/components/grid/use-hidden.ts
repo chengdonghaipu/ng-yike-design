@@ -51,7 +51,6 @@ export function useHidden(this: HiddenInputs, hostDom: HostDom, breakpoint: UseB
       if (match && input) {
         needHidden = true;
       }
-      // console.log(bp, match);
     });
     // console.log(needHidden, hidden);
     if (needHidden && !hidden) {
@@ -63,6 +62,9 @@ export function useHidden(this: HiddenInputs, hostDom: HostDom, breakpoint: UseB
 
   // 初始
   updateStyle(mediaMatchers());
+
+  const resize = useResize();
+  resize.pipe(throttleTime(1000)).subscribe(() => updateStyle(mediaMatchers()));
 
   onChanges.call(this, changes => {
     Object.keys(changes).forEach(key => {

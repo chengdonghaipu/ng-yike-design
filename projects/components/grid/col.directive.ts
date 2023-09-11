@@ -126,10 +126,10 @@ function useUpdateHostStyles<T extends object>(this: T, hostDom: HostDom): Parti
 
 @Directive()
 class ColInputs {
-  @Input({ transform: numberAttribute }) nxSpan!: number | string;
-  @Input({ transform: numberAttribute }) nxOffset!: number | string;
-  @Input({ transform: numberAttribute }) nxPull!: number | string;
-  @Input({ transform: numberAttribute }) nxPush!: number | string;
+  @Input({ transform: numberAttribute }) nxSpan!: number;
+  @Input({ transform: numberAttribute }) nxOffset!: number;
+  @Input({ transform: numberAttribute }) nxPull!: number;
+  @Input({ transform: numberAttribute }) nxPush!: number;
 }
 
 @Directive({
