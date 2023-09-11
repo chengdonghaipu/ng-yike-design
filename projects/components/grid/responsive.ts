@@ -170,3 +170,55 @@ export function useResponsive<T extends object>(
 export function useSpanResponsive(this: SpanResponsiveInputs, hostDom: HostDom): void {
   useResponsive.call(this, hostDom, 'span');
 }
+
+@Directive()
+export class PullResponsiveInputs {
+  // @Input({ alias: 'nxSpan', transform: numberAttribute }) nxSpan!: number;
+  @Input({ alias: 'pull.xs', transform: numberAttribute }) pullXs!: number;
+  @Input({ alias: 'pull.sm', transform: numberAttribute }) pullSm!: number;
+  @Input({ alias: 'pull.md', transform: numberAttribute }) pullMd!: number;
+  @Input({ alias: 'pull.lg', transform: numberAttribute }) pullLg!: number;
+  @Input({ alias: 'pull.xl', transform: numberAttribute }) pullXl!: number;
+  @Input({ alias: 'pull.xxl', transform: numberAttribute }) pullXxl!: number;
+
+  @Input({ alias: 'pull.gt-xs', transform: numberAttribute }) pullGtXs!: number;
+  @Input({ alias: 'pull.lt-sm', transform: numberAttribute }) pullLtSm!: number;
+  @Input({ alias: 'pull.gt-sm', transform: numberAttribute }) pullGtSm!: number;
+  @Input({ alias: 'pull.lt-md', transform: numberAttribute }) pullLtMd!: number;
+  @Input({ alias: 'pull.gt-md', transform: numberAttribute }) pullGtMd!: number;
+  @Input({ alias: 'pull.lt-lg', transform: numberAttribute }) pullLtLg!: number;
+  @Input({ alias: 'pull.gt-lg', transform: numberAttribute }) pullGtLg!: number;
+  @Input({ alias: 'pull.lt-xl', transform: numberAttribute }) pullLtXl!: number;
+  @Input({ alias: 'pull.gt-xl', transform: numberAttribute }) pullGtXl!: number;
+  @Input({ alias: 'pull.lt-xxl', transform: numberAttribute }) pullLtXxl!: number;
+}
+
+export function usePullResponsive(this: PullResponsiveInputs, hostDom: HostDom): void {
+  useResponsive.call(this, hostDom, 'pull', (bp, span) => `yk-col-${bp}-pull-${span}`);
+}
+
+@Directive()
+export class OffsetResponsiveInputs {
+  // @Input({ alias: 'nxSpan', transform: numberAttribute }) nxSpan!: number;
+  @Input({ alias: 'offset.xs', transform: numberAttribute }) offsetXs!: number;
+  @Input({ alias: 'offset.sm', transform: numberAttribute }) offsetSm!: number;
+  @Input({ alias: 'offset.md', transform: numberAttribute }) offsetMd!: number;
+  @Input({ alias: 'offset.lg', transform: numberAttribute }) offsetLg!: number;
+  @Input({ alias: 'offset.xl', transform: numberAttribute }) offsetXl!: number;
+  @Input({ alias: 'offset.xxl', transform: numberAttribute }) offsetXxl!: number;
+
+  @Input({ alias: 'offset.gt-xs', transform: numberAttribute }) offsetGtXs!: number;
+  @Input({ alias: 'offset.lt-sm', transform: numberAttribute }) offsetLtSm!: number;
+  @Input({ alias: 'offset.gt-sm', transform: numberAttribute }) offsetGtSm!: number;
+  @Input({ alias: 'offset.lt-md', transform: numberAttribute }) offsetLtMd!: number;
+  @Input({ alias: 'offset.gt-md', transform: numberAttribute }) offsetGtMd!: number;
+  @Input({ alias: 'offset.lt-lg', transform: numberAttribute }) offsetLtLg!: number;
+  @Input({ alias: 'offset.gt-lg', transform: numberAttribute }) offsetGtLg!: number;
+  @Input({ alias: 'offset.lt-xl', transform: numberAttribute }) offsetLtXl!: number;
+  @Input({ alias: 'offset.gt-xl', transform: numberAttribute }) offsetGtXl!: number;
+  @Input({ alias: 'offset.lt-xxl', transform: numberAttribute }) offsetLtXxl!: number;
+}
+
+export function useOffsetResponsive(this: OffsetResponsiveInputs, hostDom: HostDom): void {
+  useResponsive.call(this, hostDom, 'offset', (bp, span) => `yk-col-${bp}-offset-${span}`);
+}

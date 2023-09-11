@@ -5,9 +5,27 @@
 
 import { NxColDirective } from './col.directive';
 import { NxHiddenDirective } from './hidden.directive';
-import { NxSpanResponsiveDirective } from './responsive.directive';
+import {
+  NxPOffsetResponsiveDirective,
+  NxPullResponsiveDirective,
+  NxSpanResponsiveDirective
+} from './responsive.directive';
 import { NxRowDirective } from './row.directive';
 
-export const NxFlexLayoutModule = [NxColDirective, NxRowDirective, NxHiddenDirective, NxSpanResponsiveDirective];
+export const NxFlexLayoutModule = [
+  NxColDirective,
+  NxRowDirective,
+  NxHiddenDirective,
+  NxSpanResponsiveDirective,
+  NxPullResponsiveDirective,
+  NxPOffsetResponsiveDirective
+];
 
-export { NxColDirective, NxRowDirective, NxHiddenDirective, NxSpanResponsiveDirective };
+export {
+  NxColDirective,
+  NxRowDirective,
+  NxHiddenDirective,
+  NxSpanResponsiveDirective,
+  NxPullResponsiveDirective,
+  NxPOffsetResponsiveDirective
+};
