@@ -8,6 +8,7 @@ import { Directive, inject, Input, numberAttribute, Renderer2 } from '@angular/c
 
 import { HostDom, onChanges } from 'ng-yk-design/core';
 import { gridResponsiveMap } from 'ng-yk-design/core/util';
+import { NxPushResponsiveDirective } from 'ng-yk-design/grid/responsive.directive';
 
 @Directive()
 export class SpanResponsiveInputs {
@@ -221,4 +222,30 @@ export class OffsetResponsiveInputs {
 
 export function useOffsetResponsive(this: OffsetResponsiveInputs, hostDom: HostDom): void {
   useResponsive.call(this, hostDom, 'offset', (bp, span) => `yk-col-${bp}-offset-${span}`);
+}
+
+@Directive()
+export class PushResponsiveInputs {
+  // @Input({ alias: 'nxSpan', transform: numberAttribute }) nxSpan!: number;
+  @Input({ alias: 'push.xs', transform: numberAttribute }) pushXs!: number;
+  @Input({ alias: 'push.sm', transform: numberAttribute }) pushSm!: number;
+  @Input({ alias: 'push.md', transform: numberAttribute }) pushMd!: number;
+  @Input({ alias: 'push.lg', transform: numberAttribute }) pushLg!: number;
+  @Input({ alias: 'push.xl', transform: numberAttribute }) pushXl!: number;
+  @Input({ alias: 'push.xxl', transform: numberAttribute }) pushXxl!: number;
+
+  @Input({ alias: 'push.gt-xs', transform: numberAttribute }) pushGtXs!: number;
+  @Input({ alias: 'push.lt-sm', transform: numberAttribute }) pushLtSm!: number;
+  @Input({ alias: 'push.gt-sm', transform: numberAttribute }) pushGtSm!: number;
+  @Input({ alias: 'push.lt-md', transform: numberAttribute }) pushLtMd!: number;
+  @Input({ alias: 'push.gt-md', transform: numberAttribute }) pushGtMd!: number;
+  @Input({ alias: 'push.lt-lg', transform: numberAttribute }) pushLtLg!: number;
+  @Input({ alias: 'push.gt-lg', transform: numberAttribute }) pushGtLg!: number;
+  @Input({ alias: 'push.lt-xl', transform: numberAttribute }) pushLtXl!: number;
+  @Input({ alias: 'push.gt-xl', transform: numberAttribute }) pushGtXl!: number;
+  @Input({ alias: 'push.lt-xxl', transform: numberAttribute }) pushLtXxl!: number;
+}
+
+export function usePushResponsive(this: PushResponsiveInputs, hostDom: HostDom): void {
+  useResponsive.call(this, hostDom, 'push', (bp, span) => `yk-col-${bp}-push-${span}`);
 }

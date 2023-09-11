@@ -6,8 +6,9 @@
 import { NxColDirective } from './col.directive';
 import { NxHiddenDirective } from './hidden.directive';
 import {
-  NxPOffsetResponsiveDirective,
+  NxOffsetResponsiveDirective,
   NxPullResponsiveDirective,
+  NxPushResponsiveDirective,
   NxSpanResponsiveDirective
 } from './responsive.directive';
 import { NxRowDirective } from './row.directive';
@@ -18,7 +19,8 @@ export const NxFlexLayoutModule = [
   NxHiddenDirective,
   NxSpanResponsiveDirective,
   NxPullResponsiveDirective,
-  NxPOffsetResponsiveDirective
+  NxOffsetResponsiveDirective,
+  NxPushResponsiveDirective
 ];
 
 export {
@@ -27,5 +29,6 @@ export {
   NxHiddenDirective,
   NxSpanResponsiveDirective,
   NxPullResponsiveDirective,
-  NxPOffsetResponsiveDirective
+  NxOffsetResponsiveDirective,
+  NxPushResponsiveDirective
 };

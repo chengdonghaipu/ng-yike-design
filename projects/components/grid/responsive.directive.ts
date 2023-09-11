@@ -10,9 +10,11 @@ import { useHostDom } from 'ng-yk-design/core';
 import {
   OffsetResponsiveInputs,
   PullResponsiveInputs,
+  PushResponsiveInputs,
   SpanResponsiveInputs,
   useOffsetResponsive,
   usePullResponsive,
+  usePushResponsive,
   useSpanResponsive
 } from './responsive';
 
@@ -74,10 +76,32 @@ export class NxPullResponsiveDirective extends PullResponsiveInputs {
     '[nxCol][offset.lt-xxl]',
   standalone: true
 })
-export class NxPOffsetResponsiveDirective extends OffsetResponsiveInputs {
+export class NxOffsetResponsiveDirective extends OffsetResponsiveInputs {
   private readonly hostDom = useHostDom();
   constructor() {
     super();
     useOffsetResponsive.call(this, this.hostDom);
+  }
+}
+
+@Directive({
+  selector:
+    'nx-col[push.xs], nx-col[push.sm], nx-col[push.md],' +
+    'nx-col[push.lg], nx-col[push.xl], nx-col[push.xxl], nx-col[push.gt-xs],' +
+    'nx-col[push.lt-sm], nx-col[push.gt-sm], nx-col[push.lt-md], nx-col[push.gt-md],' +
+    'nx-col[push.lt-lg], nx-col[push.gt-lg], nx-col[push.lt-xl], nx-col[push.gt-xl],' +
+    'nx-col[push.lt-xxl],' +
+    '[nxCol][push.xs], [nxCol][push.sm], [nxCol][push.md],' +
+    '[nxCol][push.lg], [nxCol][push.xl], [nxCol][push.xxl], [nxCol][push.gt-xs],' +
+    '[nxCol][push.lt-sm], [nxCol][push.gt-sm], [nxCol][push.lt-md], [nxCol][push.gt-md],' +
+    '[nxCol][push.lt-lg], [nxCol][push.gt-lg], [nxCol][push.lt-xl], [nxCol][push.gt-xl],' +
+    '[nxCol][push.lt-xxl]',
+  standalone: true
+})
+export class NxPushResponsiveDirective extends PushResponsiveInputs {
+  private readonly hostDom = useHostDom();
+  constructor() {
+    super();
+    usePushResponsive.call(this, this.hostDom);
   }
 }
