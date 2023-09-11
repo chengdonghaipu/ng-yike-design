@@ -6,3 +6,4 @@
 export * from './provide';
 export * from './types';
 export * from './host-dom';
+export * from './lifecycle';
