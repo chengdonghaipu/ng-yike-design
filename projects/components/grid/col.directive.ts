@@ -17,7 +17,7 @@ import {
 import { toObservable } from '@angular/core/rxjs-interop';
 import { skip } from 'rxjs';
 
-import { HostDom, SafaAny, useHostDom } from 'ng-yk-design/core';
+import { HostDom, onChanges, SafaAny, useHostDom } from 'ng-yk-design/core';
 
 import { NxRowDirective } from './row.directive';
 
@@ -25,7 +25,6 @@ interface UpdateHostStylesReturn {
   readonly rowDirective: NxRowDirective;
   readonly columns: Signal<number>;
 
-  ngOnChanges(changes: SimpleChanges): void;
   updateDepColumnsStyle(column: number, context: SafaAny): void;
 }
 
@@ -67,7 +66,7 @@ const inputsMap = {
   }
 };
 
-function useUpdateHostStyles(hostDom: HostDom): Partial<UpdateHostStylesReturn> {
+function useUpdateHostStyles<T extends object>(this: T, hostDom: HostDom): Partial<UpdateHostStylesReturn> {
   const rowDirective = inject(NxRowDirective, { optional: true, host: true, skipSelf: true });
 
   if (!rowDirective) {
@@ -106,20 +105,20 @@ function useUpdateHostStyles(hostDom: HostDom): Partial<UpdateHostStylesReturn> 
 
   const inputsName = Object.keys(inputsMap);
 
-  function ngOnChanges(changes: SimpleChanges): void {
+  onChanges.call(this, changes => {
     Object.keys(changes).forEach(key => {
       if (inputsName.indexOf(key) === -1) {
         return;
       }
+
       const val = changes[key].currentValue;
       const input = inputsMap[key as keyof typeof inputsMap];
       input.update(hostDom, val, columns());
     });
-  }
+  });
 
   return {
     rowDirective,
-    ngOnChanges,
     columns: rowDirective.columns,
     updateDepColumnsStyle
   };
@@ -140,15 +139,11 @@ class ColInputs {
     class: 'yk-flex-col'
   }
 })
-export class NxColDirective extends ColInputs implements OnChanges, OnInit {
+export class NxColDirective extends ColInputs implements OnInit {
   private readonly hostDom = useHostDom();
-  private readonly updateHostStyles = useUpdateHostStyles(this.hostDom);
+  private readonly updateHostStyles = useUpdateHostStyles.call(this, this.hostDom);
   private readonly columns = computed(() => this.updateHostStyles.columns?.() || 24);
   private readonly columns$ = toObservable(this.columns).pipe(skip(1));
-
-  ngOnChanges(changes: SimpleChanges): void {
-    this.updateHostStyles.ngOnChanges?.(changes);
-  }
 
   ngOnInit(): void {
     this.columns$.subscribe(value => this.updateHostStyles.updateDepColumnsStyle?.(value, this));

@@ -43,8 +43,6 @@ export function useHidden(this: HiddenInputs, hostDom: HostDom, breakpoint: UseB
   const { matchesForEach, mediaMatchers } = breakpoint;
   const { hasClass, removeClass, addClass } = hostDom;
 
-  const resize = useResize();
-
   const updateStyle = (state: TypeObject<boolean>): void => {
     const hiddenClass = 'yk-flex-hidden';
     const hidden = hasClass(hiddenClass);
@@ -69,8 +67,6 @@ export function useHidden(this: HiddenInputs, hostDom: HostDom, breakpoint: UseB
 
   // 初始
   updateStyle(mediaMatchers());
-
-  resize.pipe(throttleTime(1000)).subscribe(() => updateStyle(mediaMatchers()));
 
   function ngOnChanges(changes: SimpleChanges): void {
     Object.keys(changes).forEach(key => {
