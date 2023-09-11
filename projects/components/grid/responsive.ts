@@ -4,16 +4,10 @@
  */
 
 import { DOCUMENT } from '@angular/common';
-import { computed, Directive, inject, Input, numberAttribute, Renderer2, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { filter, map, throttleTime } from 'rxjs';
+import { Directive, inject, Input, numberAttribute, Renderer2 } from '@angular/core';
 
-import { HostDom, onChanges, TypeObject } from 'ng-yk-design/core';
-import { gridResponsiveMap, UseBreakpointReturn, useResize } from 'ng-yk-design/core/util';
-
-import { NxColDirective } from './col.directive';
-import { NxRowDirective } from './row.directive';
-import { convertClassName } from './util';
+import { HostDom, onChanges } from 'ng-yk-design/core';
+import { gridResponsiveMap } from 'ng-yk-design/core/util';
 
 @Directive()
 export class SpanResponsiveInputs {
@@ -43,18 +37,6 @@ function camelToKebabCase(input: string): string {
 
 function toFixed5(value: number): string {
   return String(parseFloat(value.toFixed(4)));
-}
-
-function removeNullProperties<T extends object>(obj: T): T {
-  const cleanedObj = { ...obj };
-
-  for (const key in cleanedObj) {
-    if (cleanedObj[key] === null) {
-      delete cleanedObj[key];
-    }
-  }
-
-  return cleanedObj;
 }
 
 function responsiveColSize(breakpoint: keyof typeof gridResponsiveMap): string {
@@ -148,7 +130,12 @@ function genResponsiveStyle(): void {
   render.appendChild(document.head, styleElement);
 }
 
-export function useSpanResponsive(this: SpanResponsiveInputs, hostDom: HostDom): void {
+export function useResponsive<T extends object>(
+  this: T,
+  hostDom: HostDom,
+  input: string,
+  genClassname?: (bp: string, span: number) => string
+): void {
   genResponsiveStyle();
   const { hasClass, addClass } = hostDom;
 
@@ -162,7 +149,7 @@ export function useSpanResponsive(this: SpanResponsiveInputs, hostDom: HostDom):
 
   onChanges.call(this, changes => {
     Object.keys(changes).forEach(key => {
-      if (!key.concat('span') && !(key.length <= 'span'.length)) {
+      if (!key.concat(input) && !(key.length <= input.length)) {
         return;
       }
 
@@ -172,10 +159,14 @@ export function useSpanResponsive(this: SpanResponsiveInputs, hostDom: HostDom):
         return;
       }
 
-      const bp = camelToKebabCase(key.replace('span', ''));
-      const classname = `yk-col-${bp}-${val}`;
+      const bp = camelToKebabCase(key.replace(input, ''));
+      const classname = genClassname?.(bp, val) || `yk-col-${bp}-${val}`;
 
       updateStyle(classname);
     });
   });
+}
+
+export function useSpanResponsive(this: SpanResponsiveInputs, hostDom: HostDom): void {
+  useResponsive.call(this, hostDom, 'span');
 }
