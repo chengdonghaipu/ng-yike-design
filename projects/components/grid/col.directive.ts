@@ -3,17 +3,7 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import {
-  computed,
-  Directive,
-  inject,
-  Input,
-  numberAttribute,
-  OnChanges,
-  OnInit,
-  Signal,
-  SimpleChanges
-} from '@angular/core';
+import { computed, Directive, inject, Input, numberAttribute } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { skip } from 'rxjs';
 
@@ -23,7 +13,6 @@ import { NxRowDirective } from './row.directive';
 
 interface UpdateHostStylesReturn {
   readonly rowDirective: NxRowDirective;
-  readonly columns: Signal<number>;
 
   updateDepColumnsStyle(column: number, context: SafaAny): void;
 }
@@ -73,7 +62,7 @@ function useUpdateHostStyles<T extends object>(this: T, hostDom: HostDom): Parti
     return {};
   }
 
-  const columns = rowDirective.columns;
+  const columns = computed(() => rowDirective.columns());
 
   function updateDepColumnsStyle(column: number, context: SafaAny): void {
     const filterInputs = ['nxSpan', 'nxOffset', 'nxPull', 'nxPush'];
@@ -86,6 +75,10 @@ function useUpdateHostStyles<T extends object>(this: T, hostDom: HostDom): Parti
       value.update(hostDom, context[key], column);
     });
   }
+
+  toObservable(rowDirective.columns)
+    .pipe(skip(1))
+    .subscribe(value => updateDepColumnsStyle(value, this));
 
   toObservable(rowDirective.gutter).subscribe(([mainAxis, crossAxis]) => {
     if (crossAxis === 0) {
@@ -119,7 +112,6 @@ function useUpdateHostStyles<T extends object>(this: T, hostDom: HostDom): Parti
 
   return {
     rowDirective,
-    columns: rowDirective.columns,
     updateDepColumnsStyle
   };
 }
@@ -139,13 +131,10 @@ class ColInputs {
     class: 'yk-flex-col'
   }
 })
-export class NxColDirective extends ColInputs implements OnInit {
+export class NxColDirective extends ColInputs {
   private readonly hostDom = useHostDom();
-  private readonly updateHostStyles = useUpdateHostStyles.call(this, this.hostDom);
-  private readonly columns = computed(() => this.updateHostStyles.columns?.() || 24);
-  private readonly columns$ = toObservable(this.columns).pipe(skip(1));
-
-  ngOnInit(): void {
-    this.columns$.subscribe(value => this.updateHostStyles.updateDepColumnsStyle?.(value, this));
+  constructor() {
+    super();
+    useUpdateHostStyles.call(this, this.hostDom);
   }
 }
