@@ -6,7 +6,6 @@
 import { Directive } from '@angular/core';
 
 import { useHostDom } from 'ng-yk-design/core';
-import { useBreakpoint } from 'ng-yk-design/core/util';
 
 import { SpanResponsiveInputs, useSpanResponsive } from './responsive';
 
@@ -26,9 +25,8 @@ import { SpanResponsiveInputs, useSpanResponsive } from './responsive';
 })
 export class NxSpanResponsiveDirective extends SpanResponsiveInputs {
   private readonly hostDom = useHostDom();
-  private readonly breakpoint = useBreakpoint();
   constructor() {
     super();
-    useSpanResponsive.call(this, this.hostDom, this.breakpoint);
+    useSpanResponsive.call(this, this.hostDom);
   }
 }

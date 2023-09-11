@@ -10,10 +10,10 @@ import { filter, map, throttleTime } from 'rxjs';
 
 import { HostDom, onChanges, TypeObject } from 'ng-yk-design/core';
 import { gridResponsiveMap, UseBreakpointReturn, useResize } from 'ng-yk-design/core/util';
-import { NxColDirective } from 'ng-yk-design/grid/col.directive';
-import { convertClassName } from 'ng-yk-design/grid/util';
 
+import { NxColDirective } from './col.directive';
 import { NxRowDirective } from './row.directive';
+import { convertClassName } from './util';
 
 @Directive()
 export class SpanResponsiveInputs {
@@ -35,6 +35,10 @@ export class SpanResponsiveInputs {
   @Input({ alias: 'span.lt-xl', transform: numberAttribute }) spanLtXl!: number;
   @Input({ alias: 'span.gt-xl', transform: numberAttribute }) spanGtXl!: number;
   @Input({ alias: 'span.lt-xxl', transform: numberAttribute }) spanLtXxl!: number;
+}
+
+function camelToKebabCase(input: string): string {
+  return input.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
 
 function toFixed5(value: number): string {
@@ -92,7 +96,13 @@ function genResponsiveStyle(): void {
   const document = inject(DOCUMENT);
   const render = inject(Renderer2);
 
+  if (document.head.querySelector('style[self-style=true]')) {
+    return;
+  }
+
   const styleElement = render.createElement('style');
+
+  render.setAttribute(styleElement, 'self-style', 'true');
 
   const cssContent = [
     responsiveColSize('xs'),
@@ -112,8 +122,11 @@ function genResponsiveStyle(): void {
     responsiveColSize('lt-xxl'),
     responsiveColSize('xxl')
   ];
+
   const text = render.createText(cssContent.join('\n'));
+
   render.appendChild(styleElement, text);
+
   const linkList = document.head.querySelectorAll('link');
 
   let firstLink: HTMLLinkElement | null = null;
@@ -135,91 +148,34 @@ function genResponsiveStyle(): void {
   render.appendChild(document.head, styleElement);
 }
 
-export function useSpanResponsive(this: SpanResponsiveInputs, hostDom: HostDom, breakpoint: UseBreakpointReturn): void {
-  const { matchesForEach, mediaMatchers } = breakpoint;
+export function useSpanResponsive(this: SpanResponsiveInputs, hostDom: HostDom): void {
   genResponsiveStyle();
-  const { hasClass, removeClass, addClass, getHostStyle, setHostStyle, setHostStyles } = hostDom;
-  const rowDirective = inject(NxRowDirective, { optional: true, host: true, skipSelf: true });
-  const colDirective = inject(NxColDirective, { optional: true, self: true });
-  const columns = computed(() => rowDirective?.columns() || 24);
-  const nxSpan = (): number | undefined => colDirective?.nxSpan;
-  const activeSpan = signal<number | null>(null);
+  const { hasClass, addClass } = hostDom;
 
-  const maxWidthStyle = signal<string | null>(null);
-  const flexStyle = signal<string | null>(null);
-
-  const styleMap = computed(() => ({
-    maxWidth: maxWidthStyle(),
-    flex: flexStyle()
-  }));
-
-  toObservable(styleMap)
-    .pipe(map(value => removeNullProperties(value) as CSSStyleDeclaration))
-    .subscribe(value => {
-      console.log('update', value);
-      // setHostStyles(value);
-    });
-  console.dir(hostDom.element());
-  console.log(getHostStyle('cssText'));
-  console.log(colDirective, nxSpan());
-
-  toObservable(activeSpan)
-    .pipe(
-      filter(value => value != null),
-      map(value => value as number)
-    )
-    .subscribe(value => {
-      const width = toFixed5((value / columns()) * 100);
-      maxWidthStyle.set(`${width}%`);
-      flexStyle.set(`0 0 ${width}%`);
-    });
-  const updateStyle = (state: TypeObject<boolean>): void => {
-    matchesForEach(state, (bp, match) => {
-      const alias = `span.${bp}`;
-      const input = numberAttribute(this[convertClassName(alias) as 'spanXs']);
-
-      if (match && input) {
-        activeSpan.set(input);
-        console.log(bp);
-      }
-    });
-
-    if (activeSpan() !== null) {
-    } else if (nxSpan() === undefined) {
-      hostDom.removeStyle('maxWidth');
-      hostDom.removeStyle('flex');
-    } else {
-      const span = nxSpan() as number;
-      const width = toFixed5((span / columns()) * 100);
-      const maxWidth = `${width}%`;
-      const flex = `0 0 ${maxWidth}`;
-      const cssText = getHostStyle('cssText');
-
-      console.log(cssText);
-      if (!cssText.includes(`flex: ${flex}`)) {
-        flexStyle.set(flex);
-      }
-
-      if (!cssText.includes(`max-width: ${maxWidth}`)) {
-        maxWidthStyle.set(maxWidth);
-      }
+  const updateStyle = (classname: string): void => {
+    if (hasClass(classname)) {
+      return;
     }
+
+    addClass(classname);
   };
-
-  // 初始
-  updateStyle(mediaMatchers());
-
-  const resize = useResize();
-  resize.pipe(throttleTime(1000)).subscribe(() => updateStyle(mediaMatchers()));
 
   onChanges.call(this, changes => {
     Object.keys(changes).forEach(key => {
       if (!key.concat('span') && !(key.length <= 'span'.length)) {
         return;
       }
-      const matchers = mediaMatchers();
 
-      updateStyle(matchers);
+      const val = numberAttribute(changes[key].currentValue);
+
+      if (isNaN(val)) {
+        return;
+      }
+
+      const bp = camelToKebabCase(key.replace('span', ''));
+      const classname = `yk-col-${bp}-${val}`;
+
+      updateStyle(classname);
     });
   });
 }
