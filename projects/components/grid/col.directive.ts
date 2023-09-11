@@ -105,7 +105,7 @@ function useUpdateHostStyles<T extends object>(this: T, hostDom: HostDom): Parti
 
   const inputsName = Object.keys(inputsMap);
 
-  onChanges.call(this, changes => {
+  onChanges.call(this, function (changes) {
     Object.keys(changes).forEach(key => {
       if (inputsName.indexOf(key) === -1) {
         return;

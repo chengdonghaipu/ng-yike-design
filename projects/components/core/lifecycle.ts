@@ -30,24 +30,24 @@ type LifeCycle = OnChanges &
   DoCheck;
 
 const sourceCycleContainer = new WeakMap<Function, TypeObject<Function>>();
+const container = new WeakMap<object, CycleManager<SafaAny>>();
+
+function sourceCycle(cycleName: string, constructor: Function): Function | null {
+  const sourceCycleObject = sourceCycleContainer.get(constructor) ?? {};
+
+  const sourceCycle = sourceCycleObject[cycleName];
+
+  if (sourceCycle) {
+    return sourceCycle;
+  }
+
+  return null;
+}
 
 class CycleManager<T extends object> {
   private preContainer: SafaAny[] = [];
   private postContainer: SafaAny[] = [];
-  private oldCycle: Partial<LifeCycle> = {};
   constructor(private readonly context: T & Partial<LifeCycle>) {}
-
-  private sourceCycle(cycleName: string): Function | null {
-    const sourceCycleObject = sourceCycleContainer.get(this.context.constructor) ?? {};
-
-    const sourceCycle = sourceCycleObject[cycleName];
-
-    if (sourceCycle) {
-      return sourceCycle;
-    }
-
-    return null;
-  }
 
   private setSourceCycle(cycleName: string, sourceCycle: Function): void {
     const sourceCycleObject = sourceCycleContainer.get(this.context.constructor) ?? {};
@@ -85,23 +85,36 @@ class CycleManager<T extends object> {
 
     if (oldCycle && !(oldCycle as SafaAny)[cyKey]) {
       this.setSourceCycle(cycle, oldCycle as Function);
-      this.oldCycle[cycle] = oldCycle as SafaAny;
+    }
+
+    if (this.context.constructor.prototype[cycle]) {
+      return;
     }
 
     const temp = {
-      [cycle]: (...args: SafaAny[]): void => {
-        for (const preContainerElement of this.preContainer) {
+      [cycle]: function (...args: SafaAny[]): void {
+        const that = container.get(this);
+        const oldCycle = sourceCycle(cycle, this.constructor);
+
+        if (!that) {
+          if (oldCycle && !(oldCycle as SafaAny)[cyKey]) {
+            // @ts-ignore
+            oldCycle?.call(this, ...args);
+          }
+          return;
+        }
+
+        for (const preContainerElement of that.preContainer) {
           preContainerElement(...args);
         }
 
         try {
-          const oldCycle = this.sourceCycle(cycle);
           if (oldCycle && !(oldCycle as SafaAny)[cyKey]) {
             // @ts-ignore
             oldCycle?.call(this, ...args);
           }
         } finally {
-          for (const postContainerElement of this.postContainer) {
+          for (const postContainerElement of that.postContainer) {
             postContainerElement(...args);
           }
         }
@@ -114,7 +127,6 @@ class CycleManager<T extends object> {
   }
 }
 
-const container = new WeakMap<object, CycleManager<SafaAny>>();
 export function onChanges<T extends object>(
   this: T,
   callback: OnChanges['ngOnChanges'],
@@ -123,6 +135,7 @@ export function onChanges<T extends object>(
   const cycleManager = container.get(this) ?? container.set(this, new CycleManager(this)).get(this);
 
   cycleManager?.register({ ngOnChanges: callback }, options);
+  // console.log(container);
 }
 
 export function onInit<T extends object>(
