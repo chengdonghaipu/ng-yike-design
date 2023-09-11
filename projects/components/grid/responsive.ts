@@ -3,12 +3,13 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import { computed, Directive, inject, Input, numberAttribute, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { computed, Directive, inject, Input, numberAttribute, Renderer2, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, map, throttleTime } from 'rxjs';
 
 import { HostDom, onChanges, TypeObject } from 'ng-yk-design/core';
-import { UseBreakpointReturn, useResize } from 'ng-yk-design/core/util';
+import { gridResponsiveMap, UseBreakpointReturn, useResize } from 'ng-yk-design/core/util';
 import { NxColDirective } from 'ng-yk-design/grid/col.directive';
 import { convertClassName } from 'ng-yk-design/grid/util';
 
@@ -52,8 +53,91 @@ function removeNullProperties<T extends object>(obj: T): T {
   return cleanedObj;
 }
 
+function responsiveColSize(breakpoint: keyof typeof gridResponsiveMap): string {
+  const namespace = 'yk';
+  const columns = 24;
+
+  function responsive(content: string): string {
+    return `@media only screen and ${gridResponsiveMap[breakpoint]} {
+  ${content}
+}`;
+  }
+
+  const content = [];
+
+  for (let i = 0; i <= columns; i++) {
+    const pre = toFixed5((i / columns) * 100);
+    const colItem = `.${namespace}-col-${breakpoint}-${i} {
+  max-width: ${pre}%;
+  flex: 0 0 ${pre}%;
+}`;
+    const offsetItem = `.${namespace}-offset-${breakpoint}-${i} {
+  margin-left: ${pre}%;
+}`;
+    const pushItem = `.${namespace}-push-${breakpoint}-${i} {
+  position: relative;
+  left: ${pre}%;
+}`;
+    const pullItem = `.${namespace}-pull-${breakpoint}-${i} {
+  position: relative;
+  right: ${pre}%;
+}`;
+    content.push(colItem, offsetItem, pushItem, pullItem);
+  }
+
+  return responsive(content.join('\n'));
+}
+
+function genResponsiveStyle(): void {
+  const document = inject(DOCUMENT);
+  const render = inject(Renderer2);
+
+  const styleElement = render.createElement('style');
+
+  const cssContent = [
+    responsiveColSize('xs'),
+    responsiveColSize('gt-xs'),
+    responsiveColSize('lt-sm'),
+    responsiveColSize('sm'),
+    responsiveColSize('gt-sm'),
+    responsiveColSize('lt-md'),
+    responsiveColSize('md'),
+    responsiveColSize('gt-md'),
+    responsiveColSize('lt-lg'),
+    responsiveColSize('lg'),
+    responsiveColSize('gt-lg'),
+    responsiveColSize('lt-xl'),
+    responsiveColSize('xl'),
+    responsiveColSize('gt-xl'),
+    responsiveColSize('lt-xxl'),
+    responsiveColSize('xxl')
+  ];
+  const text = render.createText(cssContent.join('\n'));
+  render.appendChild(styleElement, text);
+  const linkList = document.head.querySelectorAll('link');
+
+  let firstLink: HTMLLinkElement | null = null;
+
+  for (let i = 0; i < linkList.length; i++) {
+    if (linkList.item(i).getAttribute('rel') !== 'stylesheet') {
+      continue;
+    }
+
+    firstLink = linkList.item(i);
+    break;
+  }
+
+  if (firstLink) {
+    render.insertBefore(document.head, styleElement, firstLink);
+    return;
+  }
+
+  render.appendChild(document.head, styleElement);
+}
+
 export function useSpanResponsive(this: SpanResponsiveInputs, hostDom: HostDom, breakpoint: UseBreakpointReturn): void {
   const { matchesForEach, mediaMatchers } = breakpoint;
+  genResponsiveStyle();
   const { hasClass, removeClass, addClass, getHostStyle, setHostStyle, setHostStyles } = hostDom;
   const rowDirective = inject(NxRowDirective, { optional: true, host: true, skipSelf: true });
   const colDirective = inject(NxColDirective, { optional: true, self: true });
