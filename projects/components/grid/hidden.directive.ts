@@ -3,7 +3,7 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import { Directive, OnChanges, SimpleChanges } from '@angular/core';
+import { Directive } from '@angular/core';
 
 import { useHostDom } from 'ng-yk-design/core';
 import { useBreakpoint } from 'ng-yk-design/core/util';
@@ -34,12 +34,12 @@ import { HiddenInputs, useHidden } from './use-hidden';
     '[nxRow][nxHidden.lt-xxl]',
   standalone: true
 })
-export class NxHiddenDirective extends HiddenInputs implements OnChanges {
+export class NxHiddenDirective extends HiddenInputs {
   private readonly hostDom = useHostDom();
   private readonly breakpoint = useBreakpoint();
-  private readonly hidden = useHidden.call(this, this.hostDom, this.breakpoint);
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.hidden.ngOnChanges(changes);
+  constructor() {
+    super();
+    useHidden.call(this, this.hostDom, this.breakpoint);
   }
 }

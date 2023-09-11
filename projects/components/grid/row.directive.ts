@@ -3,9 +3,9 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import { booleanAttribute, Directive, Input, numberAttribute, OnChanges, signal, SimpleChanges } from '@angular/core';
+import { booleanAttribute, Directive, Input, numberAttribute, signal } from '@angular/core';
 
-import { HostDom, TypeObject, useHostDom } from 'ng-yk-design/core';
+import { HostDom, onChanges, TypeObject, useHostDom } from 'ng-yk-design/core';
 
 import { AlignItems, FlexDirection, FlexFlow, JustifyContent } from './types';
 
@@ -16,13 +16,13 @@ class RowInputs {
   @Input('wrap.reverse') wrapReverse!: boolean | string;
 }
 
-function useInputs(this: RowInputs, hostDom: HostDom): OnChanges {
+function useInputs(this: RowInputs, hostDom: HostDom): void {
   const inputs = ['nowrap', 'wrap', 'wrapReverse'];
   const wrapMap: TypeObject<string> = {
     wrapReverse: 'wrap-reverse'
   };
 
-  const ngOnChanges = (changes: SimpleChanges): void => {
+  onChanges.call(this, changes => {
     for (const key of Object.keys(changes)) {
       if (!inputs.includes(key)) {
         continue;
@@ -38,11 +38,7 @@ function useInputs(this: RowInputs, hostDom: HostDom): OnChanges {
         hostDom.setHostStyle('flexWrap', wrapStyles);
       }
     }
-  };
-
-  return {
-    ngOnChanges
-  };
+  });
 }
 
 @Directive({
@@ -53,12 +49,10 @@ function useInputs(this: RowInputs, hostDom: HostDom): OnChanges {
     class: 'yk-flex-row'
   }
 })
-export class NxRowDirective extends RowInputs implements OnChanges {
+export class NxRowDirective extends RowInputs {
   private readonly hostDom = useHostDom();
   readonly gutter = signal<[number, number]>([0, 0]);
   readonly columns = signal(24);
-
-  private inputs = useInputs.call(this, this.hostDom);
 
   @Input({ transform: numberAttribute }) set nxColumns(value: number) {
     this.columns.set(value);
@@ -119,7 +113,8 @@ export class NxRowDirective extends RowInputs implements OnChanges {
     this.hostDom.setHostStyle('flexDirection', value);
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.inputs.ngOnChanges(changes);
+  constructor() {
+    super();
+    useInputs.call(this, this.hostDom);
   }
 }

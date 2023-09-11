@@ -6,7 +6,7 @@
 import { booleanAttribute, Directive, Input, SimpleChanges } from '@angular/core';
 import { throttleTime } from 'rxjs';
 
-import { HostDom, TypeObject } from 'ng-yk-design/core';
+import { HostDom, onChanges, TypeObject } from 'ng-yk-design/core';
 import { UseBreakpointReturn, useResize } from 'ng-yk-design/core/util';
 
 import { convertClassName } from './util';
@@ -35,11 +35,7 @@ export class HiddenInputs {
   // @Input('nxHidden.gt-xxl') nxHiddenGtXxl!: boolean | string;
 }
 
-interface UseHiddenReturn {
-  ngOnChanges(changes: SimpleChanges): void;
-}
-
-export function useHidden(this: HiddenInputs, hostDom: HostDom, breakpoint: UseBreakpointReturn): UseHiddenReturn {
+export function useHidden(this: HiddenInputs, hostDom: HostDom, breakpoint: UseBreakpointReturn): void {
   const { matchesForEach, mediaMatchers } = breakpoint;
   const { hasClass, removeClass, addClass } = hostDom;
 
@@ -68,7 +64,7 @@ export function useHidden(this: HiddenInputs, hostDom: HostDom, breakpoint: UseB
   // 初始
   updateStyle(mediaMatchers());
 
-  function ngOnChanges(changes: SimpleChanges): void {
+  onChanges.call(this, changes => {
     Object.keys(changes).forEach(key => {
       if (!key.concat('nxHidden') && !(key.length <= 'nxHidden'.length)) {
         return;
@@ -77,9 +73,5 @@ export function useHidden(this: HiddenInputs, hostDom: HostDom, breakpoint: UseB
 
       updateStyle(matchers);
     });
-  }
-
-  return {
-    ngOnChanges
-  };
+  });
 }
