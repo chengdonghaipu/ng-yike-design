@@ -52,11 +52,6 @@ function useInputs(this: RowInputs, hostDom: HostDom): void {
 export class NxRowDirective extends RowInputs {
   private readonly hostDom = useHostDom();
   readonly gutter = signal<[number, number]>([0, 0]);
-  readonly columns = signal(24);
-
-  @Input({ transform: numberAttribute }) set nxColumns(value: number) {
-    this.columns.set(value);
-  }
 
   @Input() set nxGutter(value: number | [number, number]) {
     if (Array.isArray(value)) {

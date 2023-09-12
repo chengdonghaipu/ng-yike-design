@@ -3,82 +3,81 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-import { computed, Directive, inject, Input, numberAttribute } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Directive, inject, Input, numberAttribute, Renderer2 } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { skip } from 'rxjs';
 
 import { HostDom, onChanges, SafaAny, useHostDom } from 'ng-yk-design/core';
 
+import { genFlexLayoutCss, styleAppendToHead } from './responsive';
 import { NxRowDirective } from './row.directive';
 
-interface UpdateHostStylesReturn {
-  readonly rowDirective: NxRowDirective;
+function genFlexLayoutStyle(): void {
+  const document = inject(DOCUMENT);
+  const render = inject(Renderer2);
 
-  updateDepColumnsStyle(column: number, context: SafaAny): void;
+  if (document.head.querySelector('style[self-flex-style=true]')) {
+    return;
+  }
+
+  const styleElement = render.createElement('style');
+
+  render.setAttribute(styleElement, 'self-flex-style', 'true');
+
+  styleAppendToHead(render, genFlexLayoutCss(), styleElement);
 }
 
 const inputsMap = {
-  nxSpan: {
-    update(hostDom: HostDom, value: number, columns: number) {
+  nxOrder: {
+    update(hostDom: HostDom, value: number) {
       value = numberAttribute(value);
-      hostDom.setHostStyles({
-        maxWidth: `${(value / columns) * 100}%`,
-        flex: `0 0 ${(value / columns) * 100}%`
-      });
+
+      const classname = `yk-col-order-${value}`;
+      hostDom.addClass(classname);
+    }
+  },
+  nxSpan: {
+    update(hostDom: HostDom, value: number) {
+      value = numberAttribute(value);
+
+      const classname = `yk-col-${value}`;
+      hostDom.addClass(classname);
     }
   },
   nxOffset: {
-    update(hostDom: HostDom, value: number, columns: number) {
+    update(hostDom: HostDom, value: number) {
       value = numberAttribute(value);
-      hostDom.setHostStyles({
-        marginLeft: `${(value / columns) * 100}%`
-      });
+
+      const classname = `yk-col-offset-${value}`;
+      hostDom.addClass(classname);
     }
   },
   nxPull: {
-    update(hostDom: HostDom, value: number, columns: number) {
+    update(hostDom: HostDom, value: number) {
       value = numberAttribute(value);
-      hostDom.setHostStyles({
-        position: 'relative',
-        right: `${(value / columns) * 100}%`
-      });
+
+      const classname = `yk-col-pull-${value}`;
+      hostDom.addClass(classname);
     }
   },
   nxPush: {
-    update(hostDom: HostDom, value: number, columns: number) {
+    update(hostDom: HostDom, value: number) {
       value = numberAttribute(value);
-      hostDom.setHostStyles({
-        position: 'relative',
-        left: `${(value / columns) * 100}%`
-      });
+
+      const classname = `yk-col-push-${value}`;
+      hostDom.addClass(classname);
     }
   }
 };
 
-function useUpdateHostStyles<T extends object>(this: T, hostDom: HostDom): Partial<UpdateHostStylesReturn> {
+function useUpdateHostStyles<T extends object>(this: T, hostDom: HostDom): void {
   const rowDirective = inject(NxRowDirective, { optional: true, host: true, skipSelf: true });
 
   if (!rowDirective) {
-    return {};
+    return;
   }
 
-  const columns = computed(() => rowDirective.columns());
-
-  function updateDepColumnsStyle(column: number, context: SafaAny): void {
-    const filterInputs = ['nxSpan', 'nxOffset', 'nxPull', 'nxPush'];
-
-    Object.entries(inputsMap).forEach(([key, value]) => {
-      if (filterInputs.indexOf(key) === -1) {
-        return;
-      }
-
-      value.update(hostDom, context[key], column);
-    });
-  }
-
-  toObservable(rowDirective.columns)
-    .pipe(skip(1))
-    .subscribe(value => updateDepColumnsStyle(value, this));
+  genFlexLayoutStyle();
 
   toObservable(rowDirective.gutter).subscribe(([mainAxis, crossAxis]) => {
     if (crossAxis === 0) {
@@ -106,14 +105,9 @@ function useUpdateHostStyles<T extends object>(this: T, hostDom: HostDom): Parti
 
       const val = changes[key].currentValue;
       const input = inputsMap[key as keyof typeof inputsMap];
-      input.update(hostDom, val, columns());
+      input.update(hostDom, val);
     });
   });
-
-  return {
-    rowDirective,
-    updateDepColumnsStyle
-  };
 }
 
 @Directive()
