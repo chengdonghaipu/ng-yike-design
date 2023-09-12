@@ -50,18 +50,18 @@ export function genFlexLayoutCss(breakpoint = '', namespace = 'yk', columns = 24
   max-width: ${pre}%;
   flex: 0 0 ${pre}%;
 }`;
-    const offsetItem = `.${namespace}-offset${breakpoint}-${i} {
+    const offsetItem = `.${namespace}-col-offset${breakpoint}-${i} {
   margin-left: ${pre}%;
 }`;
-    const pushItem = `.${namespace}-push${breakpoint}-${i} {
+    const pushItem = `.${namespace}-col-push${breakpoint}-${i} {
   position: relative;
   left: ${pre}%;
 }`;
-    const pullItem = `.${namespace}-pull${breakpoint}-${i} {
+    const pullItem = `.${namespace}-col-pull${breakpoint}-${i} {
   position: relative;
   right: ${pre}%;
 }`;
-    const orderItem = `.${namespace}-order${breakpoint}-${i} {
+    const orderItem = `.${namespace}-col-order${breakpoint}-${i} {
   order: ${i};
 }`;
     content.push(colItem, offsetItem, pushItem, pullItem, orderItem);

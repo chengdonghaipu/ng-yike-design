@@ -105,7 +105,7 @@ $line-height: map.merge(('title-l': 46px,
       'text-m': 22px,
       'text-s': 18px,
     ),
-    $font-size
+    $line-height
 );
 
 $z-index: (

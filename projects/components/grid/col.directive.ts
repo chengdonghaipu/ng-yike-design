@@ -7,7 +7,7 @@ import { DOCUMENT } from '@angular/common';
 import { Directive, inject, Input, numberAttribute, Renderer2 } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 
-import { HostDom, onChanges, SafaAny, useHostDom } from 'ng-yk-design/core';
+import { HostDom, onChanges, useHostDom } from 'ng-yk-design/core';
 
 import { genFlexLayoutCss, styleAppendToHead } from './responsive';
 import { NxRowDirective } from './row.directive';
