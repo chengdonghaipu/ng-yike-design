@@ -50,7 +50,7 @@ export function useHostDom(): HostDom {
   }
 
   function addClass(name: string): void {
-    renderer.addClass(element(), name);
+    !hasClass(name) && renderer.addClass(element(), name);
   }
 
   function removeClass(name: string): void {

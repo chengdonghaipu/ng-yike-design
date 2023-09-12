@@ -8,7 +8,6 @@ import { Directive, inject, Input, numberAttribute, Renderer2 } from '@angular/c
 
 import { HostDom, onChanges } from 'ng-yk-design/core';
 import { gridResponsiveMap } from 'ng-yk-design/core/util';
-import { NxPushResponsiveDirective } from 'ng-yk-design/grid/responsive.directive';
 
 @Directive()
 export class SpanResponsiveInputs {
@@ -40,73 +39,49 @@ function toFixed5(value: number): string {
   return String(parseFloat(value.toFixed(4)));
 }
 
-function responsiveColSize(breakpoint: keyof typeof gridResponsiveMap): string {
-  const namespace = 'yk';
-  const columns = 24;
+export function genFlexLayoutCss(breakpoint = '', namespace = 'yk', columns = 24): string {
+  const content = [];
 
+  breakpoint = breakpoint ? `-${breakpoint}` : '';
+
+  for (let i = 0; i <= columns; i++) {
+    const pre = toFixed5((i / columns) * 100);
+    const colItem = `.${namespace}-col${breakpoint}-${i} {
+  max-width: ${pre}%;
+  flex: 0 0 ${pre}%;
+}`;
+    const offsetItem = `.${namespace}-offset${breakpoint}-${i} {
+  margin-left: ${pre}%;
+}`;
+    const pushItem = `.${namespace}-push${breakpoint}-${i} {
+  position: relative;
+  left: ${pre}%;
+}`;
+    const pullItem = `.${namespace}-pull${breakpoint}-${i} {
+  position: relative;
+  right: ${pre}%;
+}`;
+    const orderItem = `.${namespace}-order${breakpoint}-${i} {
+  order: ${i};
+}`;
+    content.push(colItem, offsetItem, pushItem, pullItem, orderItem);
+  }
+
+  return content.join('\n');
+}
+
+function responsiveColSize(breakpoint: keyof typeof gridResponsiveMap): string {
   function responsive(content: string): string {
     return `@media only screen and ${gridResponsiveMap[breakpoint]} {
   ${content}
 }`;
   }
 
-  const content = [];
-
-  for (let i = 0; i <= columns; i++) {
-    const pre = toFixed5((i / columns) * 100);
-    const colItem = `.${namespace}-col-${breakpoint}-${i} {
-  max-width: ${pre}%;
-  flex: 0 0 ${pre}%;
-}`;
-    const offsetItem = `.${namespace}-offset-${breakpoint}-${i} {
-  margin-left: ${pre}%;
-}`;
-    const pushItem = `.${namespace}-push-${breakpoint}-${i} {
-  position: relative;
-  left: ${pre}%;
-}`;
-    const pullItem = `.${namespace}-pull-${breakpoint}-${i} {
-  position: relative;
-  right: ${pre}%;
-}`;
-    content.push(colItem, offsetItem, pushItem, pullItem);
-  }
-
-  return responsive(content.join('\n'));
+  return responsive(genFlexLayoutCss(breakpoint));
 }
 
-function genResponsiveStyle(): void {
-  const document = inject(DOCUMENT);
-  const render = inject(Renderer2);
-
-  if (document.head.querySelector('style[self-style=true]')) {
-    return;
-  }
-
-  const styleElement = render.createElement('style');
-
-  render.setAttribute(styleElement, 'self-style', 'true');
-
-  const cssContent = [
-    responsiveColSize('xs'),
-    responsiveColSize('gt-xs'),
-    responsiveColSize('lt-sm'),
-    responsiveColSize('sm'),
-    responsiveColSize('gt-sm'),
-    responsiveColSize('lt-md'),
-    responsiveColSize('md'),
-    responsiveColSize('gt-md'),
-    responsiveColSize('lt-lg'),
-    responsiveColSize('lg'),
-    responsiveColSize('gt-lg'),
-    responsiveColSize('lt-xl'),
-    responsiveColSize('xl'),
-    responsiveColSize('gt-xl'),
-    responsiveColSize('lt-xxl'),
-    responsiveColSize('xxl')
-  ];
-
-  const text = render.createText(cssContent.join('\n'));
+export function styleAppendToHead(render: Renderer2, cssContent: string, styleElement: HTMLStyleElement): void {
+  const text = render.createText(cssContent);
 
   render.appendChild(styleElement, text);
 
@@ -129,6 +104,40 @@ function genResponsiveStyle(): void {
   }
 
   render.appendChild(document.head, styleElement);
+}
+
+function genResponsiveStyle(): void {
+  const document = inject(DOCUMENT);
+  const render = inject(Renderer2);
+
+  if (document.head.querySelector('style[self-flex-responsive-style=true]')) {
+    return;
+  }
+
+  const styleElement = render.createElement('style');
+
+  render.setAttribute(styleElement, 'self-flex-responsive-style', 'true');
+
+  const cssContent = [
+    responsiveColSize('xs'),
+    responsiveColSize('gt-xs'),
+    responsiveColSize('lt-sm'),
+    responsiveColSize('sm'),
+    responsiveColSize('gt-sm'),
+    responsiveColSize('lt-md'),
+    responsiveColSize('md'),
+    responsiveColSize('gt-md'),
+    responsiveColSize('lt-lg'),
+    responsiveColSize('lg'),
+    responsiveColSize('gt-lg'),
+    responsiveColSize('lt-xl'),
+    responsiveColSize('xl'),
+    responsiveColSize('gt-xl'),
+    responsiveColSize('lt-xxl'),
+    responsiveColSize('xxl')
+  ];
+
+  styleAppendToHead(render, cssContent.join('\n'), styleElement);
 }
 
 export function useResponsive<T extends object>(
