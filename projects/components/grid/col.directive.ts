@@ -36,6 +36,11 @@ const inputsMap = {
       hostDom.addClass(classname);
     }
   },
+  nxFlex: {
+    update(hostDom: HostDom, value: number) {
+      hostDom.setHostStyle('flex', parseFlex(value) || '');
+    }
+  },
   nxSpan: {
     update(hostDom: HostDom, value: number) {
       value = numberAttribute(value);
@@ -69,6 +74,17 @@ const inputsMap = {
     }
   }
 };
+
+function parseFlex(flex: number | string | null): string | null {
+  if (typeof flex === 'number') {
+    return `${flex} ${flex} auto`;
+  } else if (typeof flex === 'string') {
+    if (/^\d+(\.\d+)?(px|em|rem|%)$/.test(flex)) {
+      return `0 0 ${flex}`;
+    }
+  }
+  return flex;
+}
 
 function useUpdateHostStyles<T extends object>(this: T, hostDom: HostDom): void {
   const rowDirective = inject(NxRowDirective, { optional: true, host: true, skipSelf: true });
@@ -127,6 +143,7 @@ class ColInputs {
 })
 export class NxColDirective extends ColInputs {
   private readonly hostDom = useHostDom();
+  @Input() nxFlex: number | string | null = null;
   constructor() {
     super();
     useUpdateHostStyles.call(this, this.hostDom);
