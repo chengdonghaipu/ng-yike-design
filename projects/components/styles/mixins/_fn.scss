@@ -15,3 +15,7 @@
 @function getCssVarName($args...) {
   @return genVarName($args);
 }
+
+@function getCssVar($args...) {
+  @return var(#{genVarName($args)});
+}

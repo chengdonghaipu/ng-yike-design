@@ -31,6 +31,7 @@
         @include set-css-color-type(var.$colors, $type)
     }
 
+    @include set-map-css-var('link', var.$link-css-var);
     @include set-map-css-var('bg-color', var.$bg-color);
     @include set-map-css-var('text-color', var.$text-color);
     @include set-map-css-var('border-color', var.$border-color);

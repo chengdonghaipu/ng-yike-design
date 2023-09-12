@@ -1,32 +1,27 @@
 @use 'sass:map';
 @use 'sass:math';
-@use "base" as b;
+@use "../mixins/fn" as *;
 
-$colors: () !default;
-$colors: map.deep-merge(
-  (
-    'white': #ffffff,
-    'black': #000000,
-    'primary': (
-      'base': #2B5AED,
+$types: primary, success, warning, danger, error, info;
+
+$colors: (
+  ) !default;
+$colors: map.deep-merge(('white': #ffffff,
+      'black': #000000,
+      'primary': ('base': #2B5AED,
+      ),
+      'success': ('base': #1FB4A2,
+      ),
+      'warning': ('base': #FFAA1A,
+      ),
+      'danger': ('base': #FA5247,
+      ),
+      'error': ('base': #FA5247,
+      ),
+      'info': ('base': #1E20257A,
+      ),
     ),
-    'success': (
-      'base': #1FB4A2,
-    ),
-    'warning': (
-      'base': #FFAA1A,
-    ),
-    'danger': (
-      'base': #FA5247,
-    ),
-    'error': (
-      'base': #FA5247,
-    ),
-    'info': (
-      'base': #1E20257A,
-    ),
-  ),
-  $colors
+    $colors
 );
 
 $color-white: map.get($colors, 'white') !default;
@@ -40,51 +35,40 @@ $color-info: map.get($colors, 'info', 'base') !default;
 
 $font-weight-primary: 400 !default;
 
-@mixin set-color-mix-level(
-  $type,
+@mixin set-color-mix-level($type,
   $number,
   $mode: 'light',
-  $mix-color: $color-white
-) {
-  $colors: map.deep-merge(
-    (
-      $type: (
-        '#{$mode}-#{$number}':
-          mix(
-            $mix-color,
-            map.get($colors, $type, 'base'),
-            math.percentage(math.div($number, 10))
-          ),
+  $mix-color: $color-white) {
+  $colors: map.deep-merge(($type: ('#{$mode}-#{$number}': mix($mix-color,
+          map.get($colors, $type, 'base'),
+          math.percentage(math.div($number, 10))),
       ),
     ),
-    $colors
-  ) !global;
+    $colors ) !global;
 }
 
-@each $type in b.$types {
+@each $type in $types {
   @for $i from 1 through 9 {
     @include set-color-mix-level($type, $i, 'light', $color-white);
   }
 }
 
 
-@each $type in b.$types {
+@each $type in $types {
   @include set-color-mix-level($type, 2, 'dark', $color-black);
 }
 
-$font-family: () !default;
-$font-family: map.merge(
-    (
-      '':
-      "'PingFang SC', 'Helvetica Neue', Helvetica, 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif"
+$font-family: (
+  ) !default;
+$font-family: map.merge(('': "'PingFang SC', 'Helvetica Neue', Helvetica, 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif",
+      'code': "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace"
     ),
     $font-family
 );
 
-$font-size: () !default;
-$font-size: map.merge(
-    (
-      'title-l': 32px,
+$font-size: (
+  ) !default;
+$font-size: map.merge(('title-l': 32px,
       'title-m': 24px,
       'title-s': 28px,
       'text-l': 16px,
@@ -94,10 +78,27 @@ $font-size: map.merge(
     $font-size
 );
 
-$line-height: () !default;
-$line-height: map.merge(
-    (
-      'title-l': 46px,
+$link: () !default;
+$link: map.merge(('link-color': getCssVar('color', 'primary'),
+      'link-hover-color': getCssVar('color-primary', 'light-3'),
+      'link-active-color': getCssVar('color-primary', 'dark-2'),
+    ),
+    $link
+);
+
+$link-css-var: () !default;
+$link-css-var: map.merge(('link-decoration': none,
+      'link-hover-decoration': none,
+      'link-focus-decoration': none,
+      'link-focus-outline': 0,
+    ),
+    $link-css-var
+);
+
+
+$line-height: (
+  ) !default;
+$line-height: map.merge(('title-l': 46px,
       'title-m': 36px,
       'title-s': 26px,
       'text-l': 24px,
@@ -107,10 +108,9 @@ $line-height: map.merge(
     $font-size
 );
 
-$z-index: () !default;
-$z-index: map.merge(
-    (
-      'normal': 1,
+$z-index: (
+  ) !default;
+$z-index: map.merge(('normal': 1,
       'popover': 1000,
       'dialog': 2000,
     ),
@@ -119,10 +119,9 @@ $z-index: map.merge(
 
 $border-radius-base: 4px;
 
-$border-radius: () !default;
-$border-radius: map.merge(
-    (
-      'base': $border-radius-base,
+$border-radius: (
+  ) !default;
+$border-radius: map.merge(('base': $border-radius-base,
       'radius-m': 8px,
       'radius-l': 12px,
       'radius-xl': 16px,
@@ -131,37 +130,34 @@ $border-radius: map.merge(
     $border-radius
 );
 
-$bg-color: () !default;
-$bg-color: map.merge(
-  (
-    '': #ffffff,
-    'page': #f2f3f5,
-    'popover': #ffffff,
-  ),
-  $bg-color
+$bg-color: (
+  ) !default;
+$bg-color: map.merge(('': #ffffff,
+      'page': #f2f3f5,
+      'popover': #ffffff,
+    ),
+    $bg-color
 );
 
-$text-color: () !default;
-$text-color: map.merge(
-  (
-    'primary': #303133,
-    'regular': #606266,
-    'secondary': #909399,
-    'placeholder': #a8abb2,
-    'disabled': #c0c4cc,
-  ),
-  $text-color
+$text-color: (
+  ) !default;
+$text-color: map.merge(('primary': #303133,
+      'regular': #606266,
+      'secondary': #909399,
+      'placeholder': #a8abb2,
+      'disabled': #c0c4cc,
+    ),
+    $text-color
 );
 
-$border-color: () !default;
-$border-color: map.merge(
-  (
-    '': #dcdfe6,
-    'light': #e4e7ed,
-    'lighter': #ebeef5, 
-    'extra-light': #f2f6fc,
-    'dark': #d4d7de,
-    'darker': #cdd0d6,
-  ),
-  $border-color
+$border-color: (
+  ) !default;
+$border-color: map.merge(('': #dcdfe6,
+      'light': #e4e7ed,
+      'lighter': #ebeef5,
+      'extra-light': #f2f6fc,
+      'dark': #d4d7de,
+      'darker': #cdd0d6,
+    ),
+    $border-color
 );

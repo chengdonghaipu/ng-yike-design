@@ -1,31 +1,31 @@
-@use 'sass:map';
-@use 'sass:math';
-@use "var";
+//@use 'sass:map';
+//@use 'sass:math';
+//@use "var";
 @use "global-config" as gf;
-@use "base" as b;
-@use "../mixins/responsive-mixin" as *;
+//@use "base" as b;
+//@use "../mixins/responsive-mixin" as *;
 
-@for $i from 0 through b.$grid-columns {
-  $namespace: gf.$namespace;
-  .#{gf.$namespace}-col-#{$i} {
-    max-width: (math.div(1, b.$grid-columns) * $i * 100) * 1%;
-    flex: 0 0 (math.div(1, b.$grid-columns) * $i * 100) * 1%;
-  }
-
-  .#{$namespace}-col-offset-#{$i} {
-    margin-left: (math.div(1, b.$grid-columns) * $i * 100) * 1%;
-  }
-
-  .#{$namespace}-col-pull-#{$i} {
-    position: relative;
-    right: (math.div(1, b.$grid-columns) * $i * 100) * 1%;
-  }
-
-  .#{$namespace}-col-push-#{$i} {
-    position: relative;
-    left: (math.div(1, b.$grid-columns) * $i * 100) * 1%;
-  }
-}
+//@for $i from 0 through b.$grid-columns {
+//  $namespace: gf.$namespace;
+//  .#{gf.$namespace}-col-#{$i} {
+//    max-width: (math.div(1, b.$grid-columns) * $i * 100) * 1%;
+//    flex: 0 0 (math.div(1, b.$grid-columns) * $i * 100) * 1%;
+//  }
+//
+//  .#{$namespace}-col-offset-#{$i} {
+//    margin-left: (math.div(1, b.$grid-columns) * $i * 100) * 1%;
+//  }
+//
+//  .#{$namespace}-col-pull-#{$i} {
+//    position: relative;
+//    right: (math.div(1, b.$grid-columns) * $i * 100) * 1%;
+//  }
+//
+//  .#{$namespace}-col-push-#{$i} {
+//    position: relative;
+//    left: (math.div(1, b.$grid-columns) * $i * 100) * 1%;
+//  }
+//}
 
 .#{gf.$namespace}-flex-row {
   display: flex;
@@ -34,11 +34,11 @@
   box-sizing: border-box;
 }
 
-.#{gf.$namespace}-flex-hidden {
-  display: none;
-}
-
-@include col-size(xs);
+//.#{gf.$namespace}-flex-hidden {
+//  display: none;
+//}
+//
+//@include col-size(xs);
 
 //@include col-size(sm);
 //
