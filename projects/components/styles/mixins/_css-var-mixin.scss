@@ -3,7 +3,7 @@
 @use "fn";
 
 @mixin set-css-var-value($name, $value) {
-  @debug "Setting variable: #{$name} with value: #{$value}";
+  //@debug "Setting variable: #{$name} with value: #{$value}";
   #{fn.genVarName($name)}: #{$value};
 }
 
@@ -14,7 +14,7 @@
   @each $i in (2, 3, 4, 5, 6, 7, 8, 9) {
     @include set-css-var-value(
           ('color', $type, 'light', $i),
-        map.get($colors, $type, 'light-#{$i}') 
+        map.get($colors, $type, 'light-#{$i}')
     );
   }
 

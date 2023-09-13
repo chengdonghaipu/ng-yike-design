@@ -1,0 +1,18 @@
+@use "common";
+@use 'var' as *;
+
+@include common.hostBlock($btn-namespace) {
+  @include common.set-map-css-var($btn-namespace, common.$button-component)
+}
+
+@include common.hostBlock($btn-namespace) {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  transition: 0.1s;
+}

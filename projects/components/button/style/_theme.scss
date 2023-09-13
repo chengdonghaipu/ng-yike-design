@@ -1,0 +1,27 @@
+@use "common";
+@use 'var' as *;
+@use 'mixin' as *;
+
+//@include block-theme(primary)
+
+@include btn-type(primary) {
+  color: common.getCssVar('color', 'white');
+  background-color: common.getCssVar('color', 'primary');
+  border-color: transparent;
+}
+
+@include btn-type(secondary) {
+  color: common.getCssVar('color', 'info');
+  background-color: rgba(common.getCssVar('color', 'info'), .08);
+  border-color: transparent;
+}
+
+@include btn-type(outline) {
+  color: common.getCssVar('color', 'info');
+  background-color: transparent;
+  border-color: rgba(common.getCssVar('color', 'info'), .16);
+}
+
+@include btn-size() {
+
+}

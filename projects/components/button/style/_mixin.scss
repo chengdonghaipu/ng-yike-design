@@ -1,0 +1,38 @@
+@use "common";
+@use 'var' as *;
+
+@mixin block-theme($theme) {
+  $host-selector: $btn-namespace + -#{$theme};
+
+  @include common.hostBlock($host-selector) {
+    background-color: common.getCssVar('color', primary)
+  }
+}
+
+@mixin btn-type($btn-type) {
+  $class-name: #{common.$namespace}-type-#{$btn-type};
+  $selector-list: button, a;
+  $selectors: ();
+
+  @each $selector in $selector-list {
+    $selectors: append($selectors, "#{$selector}.#{$class-name}", comma);
+  }
+
+  #{$selectors} {
+    @content;
+  }
+}
+
+@mixin btn-size($btn-type) {
+  $class-name: #{common.$namespace}-size-#{$btn-type};
+  $selector-list: button, a;
+  $selectors: ();
+
+  @each $selector in $selector-list {
+    $selectors: append($selectors, "#{$selector}.#{$class-name}", comma);
+  }
+
+  #{$selectors} {
+    @content;
+  }
+}

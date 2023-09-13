@@ -1,0 +1,19 @@
+@use 'sass:map';
+@use "common";
+
+$btn-namespace: btn;
+
+$btn-theme: (
+  'primary': (
+    'bg': common.getCssVar('color', 'primary')
+  ),
+  'success': (
+    'bg': common.getCssVar('color', 'success')
+  ),
+  'warning': (
+    'bg': common.getCssVar('color', 'warning')
+  ),
+  'danger': (
+    'bg': common.getCssVar('color', 'danger')
+  )
+)

@@ -161,3 +161,27 @@ $border-color: map.merge(('': #dcdfe6,
     ),
     $border-color
 );
+
+$button-component: () !default;
+$button-component: map.merge(
+    (
+        'font-weight': getCssVar('font-weight-primary'),
+        'border-color': getCssVar('border-color'),
+        'bg-color': getCssVar('fill-color', 'blank'),
+        'text-color': getCssVar('text-color', 'regular'),
+        'disabled-text-color': getCssVar('disabled-text-color'),
+        'disabled-bg-color': getCssVar('fill-color', 'blank'),
+        'disabled-border-color': getCssVar('border-color-light'),
+        'divide-border-color': rgba($color-white, 0.5),
+        'hover-text-color': getCssVar('color-primary'),
+        'hover-bg-color': getCssVar('color-primary', 'light-9'),
+        'hover-border-color': getCssVar('color-primary-light-7'),
+        'active-text-color': getCssVar('button-hover-text-color'),
+        'active-border-color': getCssVar('color-primary'),
+        'active-bg-color': getCssVar('button', 'hover-bg-color'),
+        'outline-color': getCssVar('color-primary', 'light-5'),
+        'hover-link-text-color': getCssVar('color-info'),
+        'active-color': getCssVar('text-color', 'primary'),
+    ),
+    $button-component
+);

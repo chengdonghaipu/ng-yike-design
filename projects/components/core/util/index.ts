@@ -9,3 +9,4 @@ export function toHyphenCase(camelCase: string): string {
 }
 
 export * from './breakpoint';
+export * from './watch';

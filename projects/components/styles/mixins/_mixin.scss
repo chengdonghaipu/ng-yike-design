@@ -1,0 +1,9 @@
+@use "../variable/global-config" as gf;
+
+@mixin hostBlock($block) {
+  $host: gf.$namespace + '-' + $block;
+
+  .#{$host} {
+    @content;
+  }
+}
