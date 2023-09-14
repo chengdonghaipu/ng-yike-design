@@ -1,4 +1,5 @@
 @use "common";
+@use "sass:map";
 @use 'var' as *;
 
 @mixin block-theme($theme) {
@@ -20,6 +21,19 @@
 
   #{$selectors} {
     @content;
+
+    &:not(:disabled):hover {
+      background-color: map.get($btn-theme, $btn-type, 'hover');
+      @if $btn-type == outline {
+        border-color: transparent;
+      }
+    }
+    &:not(:disabled):active {
+      background-color: map.get($btn-theme, $btn-type, 'active');
+      @if $btn-type == outline {
+        border-color: transparent;
+      }
+    }
   }
 }
 

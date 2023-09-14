@@ -5,7 +5,19 @@ $btn-namespace: btn;
 
 $btn-theme: (
   'primary': (
-    'bg': common.getCssVar('color', 'primary')
+    'bg': common.getCssVar('color', 'primary'),
+          'hover': common.getCssVar('color', 'primary', 'light-5'),
+          'active': common.getCssVar('color', 'primary', 'light-7'),
+  ),
+  'secondary': (
+    'bg': common.getCssVar('color', 'success'),
+          'hover': common.getCssVar('color', 'info', 'light-7'),
+          'active': common.getCssVar('color', 'info', 'light-8'),
+  ),
+  'outline': (
+    'bg': common.getCssVar('color', 'success'),
+          'hover': common.getCssVar('color', 'info', 'light-8'),
+          'active': common.getCssVar('color', 'info', 'light-9'),
   ),
   'success': (
     'bg': common.getCssVar('color', 'success')

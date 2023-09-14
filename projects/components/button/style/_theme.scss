@@ -12,16 +12,42 @@
 
 @include btn-type(secondary) {
   color: common.getCssVar('color', 'info');
-  background-color: rgba(common.getCssVar('color', 'info'), .08);
+  background-color: rgba(common.getCssVar('color', 'info-rgb'), .08);
   border-color: transparent;
 }
 
 @include btn-type(outline) {
   color: common.getCssVar('color', 'info');
   background-color: transparent;
-  border-color: rgba(common.getCssVar('color', 'info'), .16);
+  border-color: rgba(common.getCssVar('color', 'info-rgb'), .16);
 }
 
-@include btn-size() {
+@include btn-size(small) {
+  padding: 0 common.getCssVar('space-size', 's');
+  min-width: 24px;
+  height: 24px;
+  font-size: common.getCssVar('font-size', 'text-s');
+  border-radius: common.getCssVar('radius-size', 's');
+}
 
+@include btn-size(medium) {
+  padding: 0 common.getCssVar('space-size', 'l');
+  min-width: 32px;
+  height: 32px;
+  border-radius:  common.getCssVar('radius-size', 'm');
+}
+
+@include btn-size(large) {
+  padding: 0 common.getCssVar('space-size', 'l');
+  min-width: 36px;
+  height: 36px;
+  border-radius:  common.getCssVar('radius-size', 'm');
+}
+
+@include btn-size(xLarge) {
+  padding: 0 common.getCssVar('space-size', 'xl');
+  min-width: 48px;
+  height: 48px;
+  font-size: common.getCssVar('font-size', 'text-l');
+  border-radius:  common.getCssVar('radius-size', 'm');
 }

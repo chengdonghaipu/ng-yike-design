@@ -27,11 +27,16 @@ interface NxShapeInputObject {
 function withNxSize<T extends NxSizeInputObject>(this: T): void {
   const hostDom = useHostDom();
 
+  function genClassname(size: NxSize): string {
+    return `yk-size-${size}`;
+  }
+  // this.nxSize
+
   onChanges.call(
     this,
     watchInputs(['nxSize'], (_, change) => {
       const value = change.currentValue as NxSize;
-      hostDom.addClass(`yk-size-${value}`);
+      hostDom.addClass(genClassname(value));
     })
   );
 }
@@ -67,20 +72,27 @@ function withNxShape<T extends NxShapeInputObject>(this: T): void {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<ng-content></ng-content>`,
   host: {
-    class: 'yk-btn'
+    class: 'yk-btn',
+    '[class.yk-type-primary]': `nxType === 'primary'`,
+    '[class.yk-type-secondary]': `nxType === 'secondary'`,
+    '[class.yk-type-outline]': `nxType === 'outline'`,
+    '[class.yk-size-small]': `nxSize === 'small'`,
+    '[class.yk-size-medium]': `nxSize === 'medium'`,
+    '[class.yk-size-large]': `nxSize === 'large'`,
+    '[class.yk-size-xLarge]': `nxSize === 'xLarge'`
   }
 })
 export class NxButtonComponent {
   // static ngAcceptInputType_nxLoading: BooleanInput;
 
   @Input() nxType: NxType = 'primary';
-  @Input() nxSize: NxSize = 'medium';
+  @Input() nxSize: NxSize = 'large';
   @Input() nxShape: NxShape = 'default';
   @Input({ transform: booleanAttribute }) nxLoading: boolean = false;
 
   constructor() {
-    withNxSize.call(this);
-    withNxType.call(this);
+    // withNxSize.call(this);
+    // withNxType.call(this);
     withNxShape.call(this);
   }
 }

@@ -13,6 +13,8 @@
     }
 
     @include set-map-css-var('font-size', var.$font-size);
+    @include set-map-css-var('space-size', var.$space-size);
+    @include set-map-css-var('radius-size', var.$radius-size);
     @include set-map-css-var('font-family', var.$font-family);
     @include set-map-css-var('line-height', var.$line-height);
 

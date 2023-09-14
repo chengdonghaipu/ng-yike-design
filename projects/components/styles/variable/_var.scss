@@ -18,7 +18,7 @@ $colors: map.deep-merge(('white': #ffffff,
       ),
       'error': ('base': #FA5247,
       ),
-      'info': ('base': #1E20257A,
+      'info': ('base': rgba(30, 32, 37),
       ),
     ),
     $colors
@@ -76,6 +76,30 @@ $font-size: map.merge(('title-l': 32px,
       'text-s': 12px,
     ),
     $font-size
+);
+
+$space-size: (
+  ) !default;
+$space-size: map.merge((
+      'xl': 24px,
+      'l': 16px,
+      'm': 12px,
+      's': 8px,
+      'ss': 4px,
+    ),
+    $space-size
+);
+
+$radius-size: (
+  ) !default;
+$radius-size: map.merge((
+      'xl': 16px,
+      'l': 12px,
+      'm': 8px,
+      's': 4px,
+      'ss': 2px,
+    ),
+    $radius-size
 );
 
 $link: () !default;
@@ -136,7 +160,7 @@ $bg-color: map.merge(('': #ffffff,
       'page': #f2f3f5,
       'popover': #ffffff,
     ),
-    $bg-color
+    $bg-color 
 );
 
 $text-color: (
