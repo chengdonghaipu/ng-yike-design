@@ -19,3 +19,7 @@
 @function getCssVar($args...) {
   @return var(#{genVarName($args)});
 }
+
+@function component-selector($host-name) {
+  @return gf.$namespace + '-' + $host-name;
+}

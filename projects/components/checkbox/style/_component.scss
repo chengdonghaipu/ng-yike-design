@@ -4,6 +4,7 @@
 //@include common.hostBlock($component-namespace) {
 //  @include common.set-map-css-var($component-namespace, $space)
 //}
+$checkbox-selector: common.component-selector(checkbox);
 
 @include common.hostBlock($component-namespace) {
   position: relative;
@@ -13,14 +14,14 @@
   line-height: common.getCssVar('line-height', 'text-m');
   cursor: pointer;
 
-  .yk-checkbox-input[type=checkbox] {
+  .#{$checkbox-selector}-input[type=checkbox] {
     width: 0;
     height: 0;
     visibility: collapse;
     user-select: none;
   }
 
-  .yk-checkbox-wrap {
+  .#{$checkbox-selector}-wrap {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -36,7 +37,7 @@
     flex-shrink: 0;
     position: relative;
 
-    &.yk-checkbox-selected, &.yk-checkbox-indeterminate {
+    &.#{$checkbox-selector}-selected, &.#{$checkbox-selector}-indeterminate {
       background-color: common.getCssVar('color', 'primary');
       border-color: common.getCssVar('color', 'primary');
 
@@ -46,11 +47,11 @@
       }
     }
 
-    &.yk-checkbox-selected:before {
+    &.#{$checkbox-selector}-selected:before {
       transform: translate(-50%,-50%) rotate(45deg) scale(1.2);
     }
 
-    &.yk-checkbox-indeterminate:before {
+    &.#{$checkbox-selector}-indeterminate:before {
       transform: translate(-50%,-50%) scale(1.2);
       top: 50%;
       width: 6px;
