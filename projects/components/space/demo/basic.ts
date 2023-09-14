@@ -1,22 +1,29 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
+import { NxSpaceComponent } from 'ng-yk-design/space';
+
 @Component({
   selector: 'app-demo-space-basic',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NxSpaceComponent],
   template: `
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p [style.align-content]=""> header works! </p>
+    <nx-space>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </nx-space>
   `,
-  styles: [``],
+  styles: [
+    `
+      nx-space div {
+        background-color: var(--yk-color-primary);
+        width: 50px;
+        height: 50px;
+      }
+    `
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BasicComponent {}

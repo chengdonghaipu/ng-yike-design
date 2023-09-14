@@ -4,5 +4,5 @@
  */
 
 export function getCssVar(namespace: string, props: string[]): string {
-  return `yk-${namespace}-${props.join('-')}`;
+  return `var(--yk-${namespace}-${props.join('-')})`;
 }
