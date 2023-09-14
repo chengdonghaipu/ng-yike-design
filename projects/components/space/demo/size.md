@@ -7,8 +7,7 @@ title:
 
 ## zh-CN
 
-按钮有五种类型：主按钮、次按钮、虚线按钮、文本按钮和链接按钮。主按钮在同一个操作区域最多出现一次。**测试**
-
+内置 4 个尺寸，分别是 s - 4px，m - 8px，l - 16px，xl -24px，默认为 l，为数字或枚举值时，是水平和垂直间距；为数组时，是 `水平间距 垂直间距`。
 ## en-US
 
 There are `primary` button, `default` button, `dashed` button, `text` button and `link` button in antd.

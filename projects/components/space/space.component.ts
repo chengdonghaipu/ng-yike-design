@@ -15,19 +15,19 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 
-import { onChanges, useHostDom } from 'ng-yk-design/core';
+import { onChanges, TypeObject, useHostDom } from 'ng-yk-design/core';
 import { getCssVar, watchInputs } from 'ng-yk-design/core/util';
 
 type numberInput = number | string;
 type NxSize = 'small' | 'medium' | 'large' | 'xLarge' | numberInput | [numberInput, numberInput];
 type AlignItems = 'start' | 'end' | 'center' | 'baseline' | 'stretch';
-type FlexDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
+type LayoutDirection = 'vertical' | 'horizontal';
 
 interface NxSpaceInputs {
   nxSize: NxSize;
   wrap: string | boolean;
   nxAlign: AlignItems | null;
-  nxDirection: FlexDirection | null;
+  nxDirection: LayoutDirection | null;
 }
 
 function withSpaceInputs<T extends NxSpaceInputs>(this: T): void {
@@ -56,11 +56,14 @@ function withSpaceInputs<T extends NxSpaceInputs>(this: T): void {
     const align = nxAlign();
     const direction = nxDirection();
 
+    // 'vertical' | 'horizontal'
+    const directionMap: TypeObject<string> = { vertical: 'column', horizontal: 'row' };
+
     const style: Partial<CSSStyleDeclaration> = {
       gap: size,
       flexWrap: wrap ? 'wrap' : 'nowrap',
       ...(align && { alignItems: align }),
-      ...(direction && { flexDirection: direction })
+      ...(direction && { flexDirection: directionMap[direction] })
     };
 
     return style;
@@ -94,8 +97,8 @@ function withSpaceInputs<T extends NxSpaceInputs>(this: T): void {
 export class NxSpaceComponent implements NxSpaceInputs {
   @Input() nxSize: NxSize = 'large';
   @Input({ transform: booleanAttribute }) wrap = false;
-  @Input() nxAlign = null;
-  @Input() nxDirection = null;
+  @Input() nxAlign: AlignItems | null = null;
+  @Input() nxDirection: LayoutDirection | null = null;
 
   constructor() {
     withSpaceInputs.call(this);
