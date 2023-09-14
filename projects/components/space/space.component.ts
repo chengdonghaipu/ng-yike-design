@@ -42,7 +42,7 @@ function withSpaceInputs<T extends NxSpaceInputs>(this: T): void {
     const size = nxSize();
 
     const typeSize: NxSize[] = ['small', 'medium', 'large', 'xLarge'];
-
+    console.log(size);
     if (typeSize.includes(size)) {
       return getCssVar('space', [size as string]);
     }
