@@ -1,8 +1,8 @@
 ---
 category: Components
-type: 通用
-title: checkbox
-subtitle: 复选框
+type: 布局
+title: space
+subtitle: 间隔
 ---
 
 ## 组件描述

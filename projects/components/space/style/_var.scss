@@ -1,0 +1,11 @@
+@use 'sass:map';
+@use "common";
+
+$component-namespace: space;
+
+$space: (
+  'small': 4px,
+  'medium': 8px,
+  'large': 16px,
+  'xLarge': 24px,
+)

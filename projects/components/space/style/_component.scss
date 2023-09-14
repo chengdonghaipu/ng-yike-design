@@ -1,0 +1,12 @@
+@use "common";
+@use 'var' as *;
+
+@include common.hostBlock($component-namespace) {
+  @include common.set-map-css-var($component-namespace, $space)
+}
+
+@include common.hostBlock($component-namespace) {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: flex-start;
+}

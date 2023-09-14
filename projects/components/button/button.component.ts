@@ -5,7 +5,14 @@
 
 import { BooleanInput } from '@angular/cdk/coercion';
 import { CommonModule } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input, ViewEncapsulation } from '@angular/core';
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  numberAttribute,
+  ViewEncapsulation
+} from '@angular/core';
 
 import { onChanges, useHostDom } from 'ng-yk-design/core';
 import { watchInputs } from 'ng-yk-design/core/util';
@@ -82,7 +89,8 @@ function withNxShape<T extends NxShapeInputObject>(this: T): void {
     '[class.yk-size-xLarge]': `nxSize === 'xLarge'`,
     '[class.yk-shape-round]': `nxShape === 'round'`,
     '[class.yk-shape-circle]': `nxShape === 'circle'`,
-    '[class.yk-shape-square]': `nxShape === 'square'`
+    '[class.yk-shape-square]': `nxShape === 'square'`,
+    '[attr.tabindex]': 'disabled ? -1 : (tabIndex === null ? null : tabIndex)'
   }
 })
 export class NxButtonComponent {
@@ -92,6 +100,8 @@ export class NxButtonComponent {
   @Input() nxSize: NxSize = 'large';
   @Input() nxShape: NxShape = 'default';
   @Input({ transform: booleanAttribute }) nxLoading: boolean = false;
+  @Input({ transform: booleanAttribute }) disabled: boolean = false;
+  @Input({ transform: numberAttribute }) tabIndex: number | string | null = null;
 
   constructor() {
     // withNxSize.call(this);

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-demo-icon-basic',
+  selector: 'app-demo-space-basic',
   standalone: true,
   imports: [CommonModule],
   template: `
