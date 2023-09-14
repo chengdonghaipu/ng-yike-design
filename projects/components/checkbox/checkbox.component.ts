@@ -47,7 +47,7 @@ let nextUniqueId = 0;
       [class.yk-checkbox-indeterminate]="indeterminate"
     ></div>
     <label class="yk-checkbox-label" [for]="inputId" #label>
-      <span><ng-content></ng-content></span>
+      <ng-content></ng-content>
     </label>
   `,
   encapsulation: ViewEncapsulation.None,
