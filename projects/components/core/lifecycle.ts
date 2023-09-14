@@ -14,7 +14,7 @@ import {
   OnInit
 } from '@angular/core';
 
-import { SafaAny, TypeObject } from './types';
+import { SafaAny, TypeObject } from './type';
 
 interface CycleOptions {
   enforce: 'pre' | 'post';

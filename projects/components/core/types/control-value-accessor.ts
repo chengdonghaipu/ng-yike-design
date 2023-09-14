@@ -3,7 +3,7 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-export * from './provide';
-export * from './type';
-export * from './host-dom';
-export * from './lifecycle';
+import { SafaAny } from 'ng-yk-design/core';
+
+export type OnTouchedType = () => SafaAny;
+export type OnChangeType = (value: SafaAny) => void;

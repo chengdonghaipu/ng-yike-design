@@ -5,7 +5,7 @@
 
 import { forwardRef, Provider, Type } from '@angular/core';
 
-import { SafaAny } from './types';
+import { SafaAny } from './type';
 
 export function provideParent(component: Type<SafaAny>, parentType: SafaAny): Provider {
   return { provide: parentType, useExisting: forwardRef(() => component) };

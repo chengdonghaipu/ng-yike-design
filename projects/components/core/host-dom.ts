@@ -5,7 +5,7 @@
 
 import { computed, ElementRef, inject, Renderer2, Signal } from '@angular/core';
 
-import { SafaAny } from './types';
+import { SafaAny } from './type';
 import { toHyphenCase } from './util';
 
 export interface HostDom {

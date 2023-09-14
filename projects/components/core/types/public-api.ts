@@ -3,7 +3,4 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-export * from './provide';
-export * from './type';
-export * from './host-dom';
-export * from './lifecycle';
+export * from './index';

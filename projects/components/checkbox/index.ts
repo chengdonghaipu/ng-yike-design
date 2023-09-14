@@ -3,4 +3,4 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-export function f(): void {}
+export * from './module';

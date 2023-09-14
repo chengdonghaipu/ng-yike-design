@@ -1,0 +1,88 @@
+@use "common";
+@use 'var' as *;
+
+//@include common.hostBlock($component-namespace) {
+//  @include common.set-map-css-var($component-namespace, $space)
+//}
+
+@include common.hostBlock($component-namespace) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  font-size: common.getCssVar('font-size', 'text-m');
+  line-height: common.getCssVar('line-height', 'text-m');
+  cursor: pointer;
+
+  .yk-checkbox-input[type=checkbox] {
+    width: 0;
+    height: 0;
+    visibility: collapse;
+    user-select: none;
+  }
+
+  .yk-checkbox-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(common.getCssVar('color', 'info-rgb'), .24);
+    border-radius: 4px;
+    background-color: common.getCssVar('color', 'white');
+    //background-color: common.getCssVar('color', 'primary');
+    transition: border-color .1s cubic-bezier(0,0,1,1),background-color .1s cubic-bezier(0,0,1,1);
+    user-select: none;
+    flex-shrink: 0;
+    position: relative;
+
+    &.yk-checkbox-selected, &.yk-checkbox-indeterminate {
+      background-color: common.getCssVar('color', 'primary');
+      border-color: common.getCssVar('color', 'primary');
+
+      &:before {
+        opacity: 1;
+        transition: all .2s cubic-bezier(.12,.4,.29,1.46) .1s;
+      }
+    }
+
+    &.yk-checkbox-selected:before {
+      transform: translate(-50%,-50%) rotate(45deg) scale(1.2);
+    }
+
+    &.yk-checkbox-indeterminate:before {
+      transform: translate(-50%,-50%) scale(1.2);
+      top: 50%;
+      width: 6px;
+      height: 1.5px;
+      background: common.getCssVar('color', 'white');
+    }
+
+    &:before {
+      content: "";
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      width: 4px;
+      height: 7px;
+      border-right: 1px solid common.getCssVar('color', 'white');
+      border-bottom: 1px solid common.getCssVar('color', 'white');
+      transform: translate(-50%,-50%) rotate(45deg) scale(0);
+      opacity: 0;
+      transition: all .1s cubic-bezier(.71,-.46,.88,.6),opacity .1s;
+    }
+
+    &:after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      border-radius: inherit;
+      opacity: 0;
+      box-shadow: 0 0 0 6.4px common.getCssVar('color', 'primary');
+      transition: all .5s cubic-bezier(.12,.4,.29,1.46);
+      content: "";
+    }
+  }
+}
