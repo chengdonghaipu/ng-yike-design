@@ -79,7 +79,10 @@ function withNxShape<T extends NxShapeInputObject>(this: T): void {
     '[class.yk-size-small]': `nxSize === 'small'`,
     '[class.yk-size-medium]': `nxSize === 'medium'`,
     '[class.yk-size-large]': `nxSize === 'large'`,
-    '[class.yk-size-xLarge]': `nxSize === 'xLarge'`
+    '[class.yk-size-xLarge]': `nxSize === 'xLarge'`,
+    '[class.yk-shape-round]': `nxShape === 'round'`,
+    '[class.yk-shape-circle]': `nxShape === 'circle'`,
+    '[class.yk-shape-square]': `nxShape === 'square'`
   }
 })
 export class NxButtonComponent {
@@ -93,6 +96,6 @@ export class NxButtonComponent {
   constructor() {
     // withNxSize.call(this);
     // withNxType.call(this);
-    withNxShape.call(this);
+    // withNxShape.call(this);
   }
 }

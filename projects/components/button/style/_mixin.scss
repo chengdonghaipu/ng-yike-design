@@ -50,3 +50,17 @@
     @content;
   }
 }
+
+@mixin btn-shape($btn-type) {
+  $class-name: #{common.$namespace}-shape-#{$btn-type};
+  $selector-list: button, a;
+  $selectors: ();
+
+  @each $selector in $selector-list {
+    $selectors: append($selectors, "#{$selector}.#{$class-name}[nx-button]", comma);
+  }
+
+  #{$selectors} {
+    @content;
+  }
+}
