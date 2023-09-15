@@ -9,6 +9,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  Directive,
   effect,
   Input,
   signal,
@@ -42,7 +43,7 @@ function withSpaceInputs<T extends NxSpaceInputs>(this: T): void {
     const size = nxSize();
 
     const typeSize: NxSize[] = ['small', 'medium', 'large', 'xLarge'];
-    console.log(size);
+
     if (typeSize.includes(size)) {
       return getCssVar('space', [size as string]);
     }
@@ -56,7 +57,6 @@ function withSpaceInputs<T extends NxSpaceInputs>(this: T): void {
     const align = nxAlign();
     const direction = nxDirection();
 
-    // 'vertical' | 'horizontal'
     const directionMap: TypeObject<string> = { vertical: 'column', horizontal: 'row' };
 
     const style: Partial<CSSStyleDeclaration> = {
@@ -82,14 +82,9 @@ function withSpaceInputs<T extends NxSpaceInputs>(this: T): void {
   effect(() => setHostStyles(computedStyle()));
 }
 
-@Component({
-  selector: 'nx-space',
+@Directive({
+  selector: 'nx-space, [nx-space]',
   standalone: true,
-  imports: [CommonModule],
-  template: ` <ng-content></ng-content> `,
-  styles: [],
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'yk-space'
   }
