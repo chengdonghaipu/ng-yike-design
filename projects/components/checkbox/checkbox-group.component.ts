@@ -9,20 +9,25 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ContentChildren,
   forwardRef,
   Input,
+  QueryList,
   ViewEncapsulation
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { OnChangeType, OnTouchedType } from 'ng-yk-design/core/types';
+import { NxSpaceComponent } from 'ng-yk-design/space';
+
+import { NxCheckboxComponent } from './checkbox.component';
 
 @Component({
   selector: 'nx-checkbox-group',
   standalone: true,
+  exportAs: 'nxCheckboxGroup',
   imports: [CommonModule],
-  template: ` <p> checkbox-group works! </p> `,
-  styles: [],
+  template: ` <ng-content></ng-content> `,
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -32,6 +37,12 @@ import { OnChangeType, OnTouchedType } from 'ng-yk-design/core/types';
       multi: true
     }
   ],
+  hostDirectives: [
+    {
+      directive: NxSpaceComponent,
+      inputs: ['nxSize', 'wrap', 'nxAlign', 'nxDirection']
+    }
+  ],
   host: {
     class: 'yk-checkbox-group'
   }
@@ -39,6 +50,7 @@ import { OnChangeType, OnTouchedType } from 'ng-yk-design/core/types';
 export class NxCheckboxGroupComponent implements ControlValueAccessor {
   @Input({ transform: booleanAttribute }) checked: boolean = false;
   @Input({ transform: booleanAttribute }) disabled: boolean = false;
+  @ContentChildren(NxCheckboxComponent, { read: NxCheckboxComponent }) checkboxList!: QueryList<NxCheckboxComponent>;
   private onChange: OnChangeType = () => {};
   private onTouched: OnTouchedType = () => {};
   registerOnChange(fn: OnChangeType): void {

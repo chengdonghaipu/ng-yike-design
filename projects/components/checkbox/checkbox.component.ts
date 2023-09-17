@@ -27,6 +27,7 @@ let nextUniqueId = 0;
 
 @Component({
   selector: 'nx-checkbox',
+  exportAs: 'nxCheckbox',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `

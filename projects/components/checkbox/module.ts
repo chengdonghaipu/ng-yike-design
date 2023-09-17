@@ -3,8 +3,9 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
+import { NxCheckboxGroupComponent } from './checkbox-group.component';
 import { NxCheckboxComponent } from './checkbox.component';
 
-export const NxCheckboxModule = [NxCheckboxComponent];
+export const NxCheckboxModule = [NxCheckboxComponent, NxCheckboxGroupComponent];
 
-export { NxCheckboxComponent };
+export { NxCheckboxComponent, NxCheckboxGroupComponent };
