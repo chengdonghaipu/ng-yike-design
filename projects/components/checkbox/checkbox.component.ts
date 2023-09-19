@@ -63,7 +63,8 @@ let nextUniqueId = 0;
     }
   ],
   host: {
-    class: 'yk-checkbox'
+    class: 'yk-checkbox',
+    '[class.yk-checkbox-disabled]': 'disabled'
   }
 })
 export class NxCheckboxComponent implements ControlValueAccessor, OnInit {
@@ -71,6 +72,7 @@ export class NxCheckboxComponent implements ControlValueAccessor, OnInit {
   private onTouched: OnTouchedType = () => {};
   private readonly _uniqueId!: string;
   @Input() id!: string;
+  @Input() value!: string;
   get inputId(): string {
     return `${this.id || this._uniqueId}-input`;
   }
