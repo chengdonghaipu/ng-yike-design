@@ -38,6 +38,9 @@ $checkbox-selector: common.component-selector(checkbox);
     height: 0;
     visibility: collapse;
     user-select: none;
+    &:focus + .#{$checkbox-selector}-wrap {
+      border-color: common.getCssVar('color', 'primary');
+    }
   }
 
   .#{$checkbox-selector}-wrap {

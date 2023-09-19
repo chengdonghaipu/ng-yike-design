@@ -12,9 +12,9 @@ import {
   ElementRef,
   EventEmitter,
   forwardRef,
-  HostListener,
   Input,
   NgZone,
+  numberAttribute,
   OnInit,
   Output,
   ViewChild,
@@ -42,6 +42,7 @@ let nextUniqueId = 0;
       [indeterminate]="indeterminate"
       [disabled]="disabled"
       (blur)="_onBlur()"
+      [tabIndex]="disabled ? -1 : tabIndex"
       (change)="$event.stopPropagation()"
     />
     <div
@@ -64,7 +65,8 @@ let nextUniqueId = 0;
   ],
   host: {
     class: 'yk-checkbox',
-    '[class.yk-checkbox-disabled]': 'disabled'
+    '[class.yk-checkbox-disabled]': 'disabled',
+    '[attr.tabindex]': 'null'
   }
 })
 export class NxCheckboxComponent implements ControlValueAccessor, OnInit {
@@ -89,10 +91,22 @@ export class NxCheckboxComponent implements ControlValueAccessor, OnInit {
   }
   private _checked: boolean = false;
   @Input({ transform: booleanAttribute }) disabled: boolean = false;
-  @Input({ transform: booleanAttribute }) indeterminate: boolean = false;
+  private _indeterminate: boolean = false;
+  @Input({ transform: booleanAttribute }) get indeterminate(): boolean {
+    return this._indeterminate;
+  }
+  set indeterminate(value: boolean) {
+    if (this._indeterminate === value) {
+      return;
+    }
 
+    this._indeterminate = value;
+    this.cdr.markForCheck();
+  }
+  @Input({ transform: (value: unknown) => (value == null ? undefined : numberAttribute(value)) })
+  tabIndex!: number;
   @Output() readonly checkedChange = new EventEmitter<boolean>();
-  // @HostListener('click', ['$event'])
+
   toggle(): void {
     this.checked = !this.checked;
     this.onChange(this.checked);
