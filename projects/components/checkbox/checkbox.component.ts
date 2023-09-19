@@ -10,11 +10,13 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  EventEmitter,
   forwardRef,
   HostListener,
   Input,
   NgZone,
   OnInit,
+  Output,
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
@@ -73,14 +75,26 @@ export class NxCheckboxComponent implements ControlValueAccessor, OnInit {
     return `${this.id || this._uniqueId}-input`;
   }
   @ViewChild('inputElement', { static: true }) inputElement!: ElementRef<HTMLInputElement>;
-  @Input({ transform: booleanAttribute }) checked: boolean = false;
+  @Input({ transform: booleanAttribute })
+  get checked(): boolean {
+    return this._checked;
+  }
+  set checked(value: boolean) {
+    if (value != this.checked) {
+      this._checked = value;
+      this.cdr.markForCheck();
+    }
+  }
+  private _checked: boolean = false;
   @Input({ transform: booleanAttribute }) disabled: boolean = false;
   @Input({ transform: booleanAttribute }) indeterminate: boolean = false;
 
+  @Output() readonly checkedChange = new EventEmitter<boolean>();
   // @HostListener('click', ['$event'])
   toggle(): void {
     this.checked = !this.checked;
     this.onChange(this.checked);
+    this.checkedChange.emit(this.checked);
   }
 
   _onBlur(): void {
