@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-yaml/yaml"
 	"github.com/yuin/goldmark"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
 	"io/ioutil"
@@ -217,6 +218,9 @@ func convertToHTML(markdownContent string) string {
 
 	md := goldmark.New(
 		goldmark.WithExtensions(extension.GFM),
+		goldmark.WithExtensions(
+			highlighting.Highlighting,
+		),
 		goldmark.WithRenderer(HtmlRenderer()),
 		goldmark.WithRendererOptions(html.WithUnsafe()),
 	)
@@ -281,6 +285,9 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 
 	md := goldmark.New(
 		goldmark.WithExtensions(extension.GFM),
+		goldmark.WithExtensions(
+			highlighting.Highlighting,
+		),
 		goldmark.WithRenderer(HtmlRenderer()),
 		goldmark.WithRendererOptions(html.WithUnsafe()),
 	)
