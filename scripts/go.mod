@@ -8,13 +8,15 @@ require (
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/google/uuid v1.3.1
 	github.com/gookit/color v1.5.4
-	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.7.0
 	github.com/yuin/goldmark v1.5.6
+	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
+	golang.org/x/text v0.13.0
 )
 
 require (
-	github.com/dlclark/regexp2 v1.4.0 // indirect
+	github.com/alecthomas/chroma/v2 v2.2.0 // indirect
+	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect

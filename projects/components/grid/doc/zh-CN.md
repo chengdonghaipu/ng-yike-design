@@ -1,7 +1,7 @@
 ---
 category: Components
 type: 布局
-title: flex
+title: Flex
 subtitle: 布局
 ---
 

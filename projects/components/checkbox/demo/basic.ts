@@ -12,6 +12,8 @@ import { NxSpaceComponent } from 'ng-yk-design/space';
     <nx-space>
       <nx-checkbox [checked]="true">checked</nx-checkbox>
       <nx-checkbox [indeterminate]="true">indeterminate</nx-checkbox>
+      <nx-checkbox [disabled]="true">disabled</nx-checkbox>
+      <nx-checkbox [disabled]="true" [checked]="true">disabled</nx-checkbox>
     </nx-space>
   `,
   styles: [``],

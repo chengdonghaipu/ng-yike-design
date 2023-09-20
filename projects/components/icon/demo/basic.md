@@ -1,8 +1,8 @@
 ---
 order: 0
 title:
-  zh-CN: 按钮类型
-  en-US: Type
+  zh-CN: 基础
+  en-US: basic
 ---
 
 ## zh-CN

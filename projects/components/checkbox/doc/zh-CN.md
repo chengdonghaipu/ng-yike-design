@@ -1,7 +1,7 @@
 ---
 category: Components
 type: 数据录入
-title: checkbox
+title: Checkbox
 subtitle: 复选框
 ---
 

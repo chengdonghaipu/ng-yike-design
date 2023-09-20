@@ -14,11 +14,33 @@ $checkbox-selector: common.component-selector(checkbox);
   line-height: common.getCssVar('line-height', 'text-m');
   cursor: pointer;
 
+  &-disabled {
+    cursor: not-allowed;
+
+    .#{$checkbox-selector}-label {
+      cursor: inherit;
+      color: rgba(common.getCssVar('color', 'info-rgb'), .48);
+    }
+
+    .#{$checkbox-selector}-wrap {
+      border-color: rgba(common.getCssVar('color', 'info-rgb'), .08) !important;
+      background-color: color-mix(in srgb, #fff, #1e2025 6.8%) !important;
+      opacity: 1;
+
+      &.#{$checkbox-selector}-selected:before {
+        border-color: rgba(common.getCssVar('color', 'info-rgb'), .48);
+      }
+    }
+  }
+
   .#{$checkbox-selector}-input[type=checkbox] {
     width: 0;
     height: 0;
     visibility: collapse;
     user-select: none;
+    &:focus + .#{$checkbox-selector}-wrap {
+      border-color: common.getCssVar('color', 'primary');
+    }
   }
 
   .#{$checkbox-selector}-wrap {

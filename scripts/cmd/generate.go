@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/fsnotify/fsnotify"
+	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"log"
@@ -28,6 +29,94 @@ var docCommand = &cobra.Command{
 	Short: "generate doc project",
 	Long:  "generate doc project",
 	Run:   runDocCommand,
+}
+
+func compileIcon(assetsDir, outputDir string) {
+	templatePath := path.Join("template", "static-icons")
+	template, err := util.ReadFile(templatePath)
+
+	if err != nil {
+		return
+	}
+	//var wg sync.WaitGroup
+	maxDepth := 2 // 设置最大遍历深度为2
+	var allIcons []string
+	allIcons = append(allIcons, "import { NxIconDefinition } from './types';")
+	_ = filepath.Walk(assetsDir, func(filePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("failure accessing a filePath %q: %v", filePath, err)
+		}
+
+		// 计算当前文件或目录的深度
+		depth := strings.Count(filePath[len(assetsDir):], string(os.PathSeparator))
+
+		// 如果深度超过最大深度，返回nil以停止遍历更深层次的目录
+		if depth > maxDepth {
+			return filepath.SkipDir
+		}
+
+		if info.IsDir() || depth != 2 {
+			return nil
+		}
+
+		ext := strings.ToLower(filepath.Ext(info.Name()))
+		if ext != ".svg" {
+			return nil
+		}
+
+		svg, err := util.ReadFile(filePath)
+
+		if err != nil {
+			return err
+		}
+
+		iconType := filepath.Base(filepath.Dir(filePath))
+		// 获取文件的名称（不包括后缀名）
+		fileName := strings.TrimSuffix(filepath.Base(filePath), filepath.Ext(filePath))
+		exportName := util.ToCamelCase(fmt.Sprintf("%s-%s", fileName, iconType))
+
+		templateNew := strings.Replace(template, "{{export}}", exportName, 1)
+		templateNew = strings.Replace(templateNew, "{{name}}", fileName, 1)
+		templateNew = strings.Replace(templateNew, "{{icon}}", svg, 1)
+		templateNew = strings.Replace(templateNew, "{{type}}", iconType, 1)
+
+		allIcons = append(allIcons, templateNew)
+
+		outputPath := path.Join(outputDir, "static-icons.ts")
+		//fmt.Println(filePath)
+		if len(allIcons) > 0 {
+			_ = util.WriteFile(outputPath, strings.Join(allIcons, "\n"))
+		}
+		return nil
+	})
+}
+
+var staticIconsCommand = &cobra.Command{
+	Use:     "static-icons",
+	Aliases: []string{"si"},
+	Short:   "generate doc static-icons",
+	Long:    "generate doc static-icons",
+	Run: func(cmd *cobra.Command, args []string) {
+		componentsDir, _ := cmd.Flags().GetString("components-dir")
+		outputDir := path.Join(componentsDir, "icon")
+		assetsDir := path.Join(componentsDir, "icon", "assets")
+
+		if !util.DirectoryExists(assetsDir) {
+			color.Yellow.Println(fmt.Sprintf("%s dir not found", assetsDir))
+			return
+		}
+
+		if !util.DirectoryExists(outputDir) {
+			err := os.MkdirAll(outputDir, os.ModePerm)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		compileIcon(assetsDir, outputDir)
+		//docsDir, _ := cmd.Flags().GetString("docs-dir")
+		//watch, _ := cmd.Flags().GetBool("watch")
+		//sourceDir := path.Join("design-doc") // 源目录
+	},
 }
 
 var serviceCommand = &cobra.Command{
@@ -335,11 +424,14 @@ func initDocCommand() {
 	docCommand.Flags().String("doc-dir", path.Join(wd, "projects", "design-doc"), "design-doc 绝对路径")
 	docCommand.Flags().String("docs-dir", path.Join(wd, "docs"), "docs 绝对路径")
 	docCommand.Flags().Bool("watch", true, "监听文件变化")
+
+	staticIconsCommand.Flags().String("components-dir", path.Join(wd, "projects", "components"), "components 绝对路径")
 }
 
 func init() {
 	initDocCommand()
 	generateCommand.AddCommand(docCommand)
 	generateCommand.AddCommand(serviceCommand)
+	generateCommand.AddCommand(staticIconsCommand)
 	rootCommand.AddCommand(generateCommand)
 }

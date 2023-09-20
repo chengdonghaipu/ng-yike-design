@@ -120,5 +120,5 @@ func (r *CustomHTMLRenderer) kindFencedCodeBlock(w util.BufWriter, source []byte
 func (r *CustomHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	r.Renderer.RegisterFuncs(reg)
 	reg.Register(ast.KindHeading, r.renderHeading)
-	reg.Register(ast.KindFencedCodeBlock, r.kindFencedCodeBlock)
+	//reg.Register(ast.KindFencedCodeBlock, r.kindFencedCodeBlock)
 }
