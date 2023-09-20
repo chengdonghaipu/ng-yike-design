@@ -95,7 +95,12 @@
             "assets": [
               "projects/design-doc/src/favicon.ico",
               "projects/design-doc/src/assets",
-              "projects/design-doc/src/manifest.webmanifest"
+              "projects/design-doc/src/manifest.webmanifest",
+              {
+                "glob": "**/*",
+                "input": "./projects/components/icon/assets/",
+                "output": "/assets/"
+              }
             ],
             "styles": [
               "projects/design-doc/src/styles.scss",
