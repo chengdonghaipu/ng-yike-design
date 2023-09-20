@@ -255,14 +255,14 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 
 	_, parentDirName := path.Split(dirPath)
 
-	re := regexp.MustCompile(`---\n([\s\S]*?)\n---`)
+	re := regexp.MustCompile(`---[\s\S]*\n([\s\S]*?)\n[\s\S]*\n---`)
 	match := re.FindStringSubmatch(string(mdContent))
 
 	if len(match) < 2 {
 		return nil, fmt.Errorf("YAML section not found")
 	}
 
-	yamlContent := match[1]
+	yamlContent := match[0]
 	markdownContent := string(mdContent)[len(yamlContent)+8:]
 
 	// 获取文件名（包括扩展名）
