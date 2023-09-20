@@ -4,6 +4,7 @@
  */
 
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, effect, inject, Input, signal, ViewEncapsulation } from '@angular/core';
 
 import { onChanges, useHostDom } from 'ng-yk-design/core';
@@ -20,6 +21,7 @@ interface NxIconInputs {
 function withInputs<T extends NxIconInputs>(this: T): void {
   const { renderer, element, setHostStyle } = useHostDom();
   const staticIcons = inject(STATIC_ICONS, { optional: true }) || [];
+  const httpClient = inject(HttpClient);
   const staticFlatIcons = staticIcons.flat();
 
   function appendSvg(svg: SVGElement): void {
@@ -29,6 +31,7 @@ function withInputs<T extends NxIconInputs>(this: T): void {
   const nxType = signal(this.type);
   const nxIcon = signal(this.icon);
   const nxSize = signal(this.size);
+  const renderIcon = signal('');
 
   function createSvgFormString(svg: string): SVGElement | null {
     const div = renderer.createElement('div') as HTMLElement;
@@ -63,22 +66,34 @@ function withInputs<T extends NxIconInputs>(this: T): void {
   });
 
   effect(() => {
-    const icon = nxIcon();
-    const type = nxType();
-    const staticIcon = staticFlatIcons.find(item => {
-      return item.name === icon && (type ? type === item.type : true);
-    });
+    const icon = renderIcon();
+    const svgElement = createSvgFormString(icon);
 
-    if (staticIcon) {
-      const svgElement = createSvgFormString(staticIcon.icon);
-
-      if (!svgElement) {
-        return;
-      }
-
-      appendSvg(svgElement);
+    if (!svgElement) {
+      return;
     }
+
+    appendSvg(svgElement);
   });
+
+  effect(
+    () => {
+      const icon = nxIcon();
+      const type = nxType();
+      const staticIcon = staticFlatIcons.find(item => {
+        return item.name === icon && (type ? type === item.type : true);
+      });
+
+      if (staticIcon) {
+        renderIcon.set(staticIcon.icon);
+      } else if (type) {
+        httpClient.get(`assets/${type}/${icon}.svg`, { responseType: 'text' }).subscribe(value => {
+          renderIcon.set(value);
+        });
+      }
+    },
+    { allowSignalWrites: true }
+  );
 }
 
 @Component({
