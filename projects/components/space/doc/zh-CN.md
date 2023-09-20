@@ -1,7 +1,7 @@
 ---
 category: Components
 type: 布局
-title: space
+title: Space
 subtitle: 间隔
 ---
 

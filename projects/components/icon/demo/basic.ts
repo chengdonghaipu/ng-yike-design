@@ -1,20 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
+import { NxIconModule } from 'ng-yk-design/icon';
+
 @Component({
   selector: 'app-demo-icon-basic',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ...NxIconModule],
   template: `
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p> header works! </p>
-    <p [style.align-content]=""> header works! </p>
+    <span nx-icon></span>
+    <nx-icon></nx-icon>
   `,
   styles: [``],
   changeDetection: ChangeDetectionStrategy.OnPush

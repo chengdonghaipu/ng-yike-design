@@ -1,8 +1,8 @@
 ---
 category: Components
 type: 通用
-title: checkbox
-subtitle: 复选框
+title: Icon
+subtitle: 图标
 ---
 
 ## 组件描述
