@@ -1,5 +1,5 @@
-export const {{export}} = {
+export const {{export}}: NxIconDefinition = {
   name: `{{name}}`,
   icon: `{{icon}}`,
   type: `{{type}}`
-}
+};

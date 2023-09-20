@@ -3,6 +3,8 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
-export * from './module';
-export * from './static-icons';
-export { provideIcons } from './provide-icons';
+export interface NxIconDefinition {
+  name: string;
+  icon: string;
+  type?: 'fill' | 'outline';
+}

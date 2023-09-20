@@ -41,6 +41,7 @@ func compileIcon(assetsDir, outputDir string) {
 	//var wg sync.WaitGroup
 	maxDepth := 2 // 设置最大遍历深度为2
 	var allIcons []string
+	allIcons = append(allIcons, "import { NxIconDefinition } from './types';")
 	_ = filepath.Walk(assetsDir, func(filePath string, info os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("failure accessing a filePath %q: %v", filePath, err)
