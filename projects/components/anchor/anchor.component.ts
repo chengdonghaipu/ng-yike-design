@@ -112,7 +112,7 @@ export class NxAnchorComponent implements NxAnchor, OnChanges, OnDestroy, AfterV
     }
 
     if (!results.length) {
-      this.clearActive();
+      this.ngZone.run(() => this.clearActive());
       return;
     }
 
