@@ -157,10 +157,13 @@ $border-radius: map.merge(('base': $border-radius-base,
 $bg-color: (
   ) !default;
 $bg-color: map.merge(('': #ffffff,
-      'page': #f2f3f5,
-      'popover': #ffffff,
+      'bgColor2': color-mix(in srgb, #fff, #1e2025 3.6%),
+      'bgColor3': color-mix(in srgb, #fff, #1e2025 6.8%),
+      'bgColor4': color-mix(in srgb, #fff, #1e2025 9.4%),
+      'bgColor5': #ffffff,
+      'bgColor6': #1e2025,
     ),
-    $bg-color 
+    $bg-color
 );
 
 $text-color: (
@@ -190,22 +193,6 @@ $button-component: () !default;
 $button-component: map.merge(
     (
         'font-weight': getCssVar('font-weight-primary'),
-        'border-color': getCssVar('border-color'),
-        'bg-color': getCssVar('fill-color', 'blank'),
-        'text-color': getCssVar('text-color', 'regular'),
-        'disabled-text-color': getCssVar('disabled-text-color'),
-        'disabled-bg-color': getCssVar('fill-color', 'blank'),
-        'disabled-border-color': getCssVar('border-color-light'),
-        'divide-border-color': rgba($color-white, 0.5),
-        'hover-text-color': getCssVar('color-primary'),
-        'hover-bg-color': getCssVar('color-primary', 'light-9'),
-        'hover-border-color': getCssVar('color-primary-light-7'),
-        'active-text-color': getCssVar('button-hover-text-color'),
-        'active-border-color': getCssVar('color-primary'),
-        'active-bg-color': getCssVar('button', 'hover-bg-color'),
-        'outline-color': getCssVar('color-primary', 'light-5'),
-        'hover-link-text-color': getCssVar('color-info'),
-        'active-color': getCssVar('text-color', 'primary'),
     ),
     $button-component
 );

@@ -4,15 +4,60 @@
 $icon-selector: common.component-selector(icon);
 
 @include common.hostBlock($component-namespace) {
-  //margin-right: 6px;
-  //font-size: common.getCssVar("font-size", 'title-m');
+  position: relative;
 
-  display: inline-block;
-  color: inherit;
-  font-style: normal;
-  line-height: 0;
-  text-align: center;
-  text-transform: none;
-  vertical-align: -0.125em;
-  text-rendering: optimizelegibility;
+  &-link {
+    display: block;
+    //padding: 4px 0 4px 16px;
+    color: rgba(common.getCssVar('color', 'info-rgb'), .72);
+    border-radius: 4px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-left: 8px;
+
+    &:hover, &-active {
+      font-weight: 500;
+      color: common.getCssVar('color', 'info');
+    }
+
+    > a {
+      color: inherit;
+      transition: .3s;
+      display: block;
+      padding: 0 8px;
+      border-radius: 4px;
+      height: 30px;
+      line-height: 30px;
+
+      &:hover {
+        background-color: common.getCssVar('bg-color', 'bgColor3');
+      }
+    }
+  }
+
+  &-marker {
+    &:before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 2px;
+      background: common.getCssVar('bg-color', 'bgColor4');
+      content: "";
+    }
+
+    &-ink {
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin-top: 7px;
+      width: 2px;
+      height: 16px;
+      border-radius: 4px;
+      background-color: common.getCssVar('color', 'primary');;
+      opacity: 0;
+      transition: top .25s cubic-bezier(0,1,.5,1),background-color .5s,opacity .25s;
+    }
+  }
 }

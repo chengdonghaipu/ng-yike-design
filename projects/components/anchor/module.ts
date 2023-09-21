@@ -3,8 +3,9 @@
  * found in the LICENSE file at https://github.com/chengdonghaipu/ng-yike-design/blob/master/LICENSE
  */
 
+import { NxAnchorListComponent } from './anchor-list.component';
 import { NxAnchorComponent } from './anchor.component';
 
-export const NxAnchorModule = [NxAnchorComponent];
+export const NxAnchorModule = [NxAnchorComponent, NxAnchorListComponent];
 
-export { NxAnchorComponent };
+export { NxAnchorComponent, NxAnchorListComponent };
