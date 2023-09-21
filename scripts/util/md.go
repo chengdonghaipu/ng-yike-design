@@ -54,7 +54,7 @@ func ParseApiDocument(filePath string) (*ApiDocument, error) {
 		return nil, err
 	}
 
-	re := regexp.MustCompile(`---\n([\s\S]*?)\n---`)
+	re := regexp.MustCompile(`---\r*\n([\s\S]*?)\r*\n---`)
 	match := re.FindStringSubmatch(string(mdContent))
 	if len(match) < 2 {
 		return nil, fmt.Errorf("YAML section not found")
@@ -141,7 +141,7 @@ func ParseMarkdown(filePath string) (*Document, error) {
 		return nil, err
 	}
 
-	re := regexp.MustCompile(`---\n([\s\S]*?)\n---`)
+	re := regexp.MustCompile(`---\r*\n([\s\S]*?)\r*\n---`)
 	match := re.FindStringSubmatch(string(mdContent))
 	if len(match) < 2 {
 		return nil, fmt.Errorf("YAML section not found")
@@ -259,14 +259,14 @@ func ParseGlobalDocument(filePath string) (*GlobalDocument, error) {
 
 	_, parentDirName := path.Split(dirPath)
 
-	re := regexp.MustCompile(`---[\s\S]*\n([\s\S]*?)\n[\s\S]*\n---`)
+	re := regexp.MustCompile(`---\r*\n([\s\S]*?)\r*\n---`)
 	match := re.FindStringSubmatch(string(mdContent))
 
 	if len(match) < 2 {
 		return nil, fmt.Errorf("YAML section not found")
 	}
 
-	yamlContent := match[0]
+	yamlContent := match[1]
 	markdownContent := string(mdContent)[len(yamlContent)+8:]
 
 	// 获取文件名（包括扩展名）
