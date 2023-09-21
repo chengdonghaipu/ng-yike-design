@@ -30,7 +30,8 @@ function withInputUiInputs<T extends NxInputUiInputs>(this: T): void {
 
   onChanges.call(
     this,
-    watchInputs(['size'], (key, change) => {
+    watchInputs(['size', 'status'], (key, change) => {
+      console.log(change);
       key === 'size' && nxSize.set(change.currentValue);
       key === 'status' && nxStatus.set(change.currentValue);
     })
@@ -45,20 +46,18 @@ function withInputUiInputs<T extends NxInputUiInputs>(this: T): void {
     hostDom.addClass(`yk-input-${size}`);
   });
   effect(() => {
-    const cl = `yk-input-${nxStatus()}`;
+    const status = nxStatus();
+    const cl = `yk-input-${status}`;
     statusCls[cl] = true;
     Object.keys(statusCls).forEach(key => {
-      if (key === cl) {
-        hostDom.addClass(cl);
-      } else {
-        hostDom.removeClass(cl);
-      }
+      hostDom.removeClass(key);
     });
+    hostDom.addClass(cl);
   });
 }
 
 @Directive({
-  selector: '[nx-input]',
+  selector: 'input[nx-input],textarea[nx-input]',
   exportAs: 'nxInput',
   standalone: true,
   host: {

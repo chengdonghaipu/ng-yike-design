@@ -7,7 +7,7 @@
 
 @include common.hostBlock($component-namespace) {
   transition: all .2s ease-in-out;
-
+  outline: none;
   &-small {
     height: 22px;
     padding: 0 8px;
@@ -34,48 +34,51 @@
   }
 
   &-default {
-    border: 1px solid common.getCssVar('border-color');
-    background-color: common.getCssVar('fill-color', 'blank');
+    border: 1px solid  common.getCssVar('bg-color', 'bgColor2');
+    background-color: common.getCssVar('bg-color', 'bgColor2');
     &:hover,&:focus{
-      border-color: common.getCssVar('color-primary') ;
+      border-color: common.getCssVar('color', 'primary') ;
     }
   }
   &-warning {
-    border: 1px solid common.getCssVar('border-color');
-    background-color: common.getCssVar('fill-color', 'blank');
+    border: 1px solid rgba(common.getCssVar('color', 'warning-rgb'), 0.12);
+    background-color: rgba(common.getCssVar('color', 'warning-rgb'), 0.12);
     &:hover,&:focus{
-      border-color: common.getCssVar('color--warning') ;
+      border-color: common.getCssVar('color-warning') ;
     }
   }
 
   &-danger {
-    border: 1px solid common.getCssVar('border-color');
-    background-color: common.getCssVar('fill-color', 'blank');
+    border: 1px solid rgba(common.getCssVar('color', 'danger-rgb'), 0.12);
+    background-color: rgba(common.getCssVar('color', 'danger-rgb'), 0.12);
     &:hover,&:focus{
-      border-color: common.getCssVar('color--danger') ;
+      border-color: common.getCssVar('color-danger') ;
     }
   }
   &-success {
-    border: 1px solid common.getCssVar('border-color');
-    background-color: common.getCssVar('fill-color', 'blank');
+    border: 1px solid rgba(common.getCssVar('color', 'success-rgb'), 0.12);
+    background-color: rgba(common.getCssVar('color', 'success-rgb'), 0.12);
     &:hover,&:focus{
       border-color: common.getCssVar('color-success') ;
     }
   }
 
   &-disabled {
-    border: 1px solid common.getCssVar('border-color');
-    background-color: common.getCssVar('fill-color', 'blank');
+    border: 1px solid  common.getCssVar('bg-color', 'bgColor2');
+    background-color: common.getCssVar('bg-color', 'bgColor2');
     cursor: not-allowed;
+    color: rgba(common.getCssVar('color', 'info-rgb'), 0.48);
+
     &:hover,&:focus{
-      border-color: common.getCssVar('border-color')!important; ;
+      border-color: common.getCssVar('bg-color', 'bgColor2'); ;
     }
   }
   &-readonly {
-    border: 1px solid common.getCssVar('border-color');
-    background-color: common.getCssVar('fill-color', 'blank');
+    border: 1px solid  common.getCssVar('bg-color', 'bgColor3');
+    background-color: common.getCssVar('bg-color', 'bgColor3');
+    color: common.getCssVar('color', 'info');
     &:hover,&:focus{
-      border-color: common.getCssVar('border-color')!important ;
+      border-color: common.getCssVar('border-color') ;
     }
   }
 
