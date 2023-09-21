@@ -1,0 +1,83 @@
+@use "common";
+@use 'var' as *;
+
+//@include common.hostBlock($component-namespace) {
+//  @include common.set-map-css-var($component-namespace, $space)
+//}
+
+@include common.hostBlock($component-namespace) {
+  transition: all .2s ease-in-out;
+
+  &-small {
+    height: 22px;
+    padding: 0 8px;
+    font-size: common.getCssVar('font-size', 'text-s');
+    border-radius: 4px
+  }
+  &-medium {
+    height: 30px;
+    padding: 0 12px;
+    font-size: common.getCssVar('font-size', 'text-m');
+    border-radius: 8px
+  }
+  &-large {
+    height: 34px;
+    padding: 0 12px;
+    font-size: common.getCssVar('font-size', 'text-m');
+    border-radius: 8px
+  }
+  &-xLarge {
+    height: 45px;
+    padding: 0 12px;
+    font-size: common.getCssVar('font-size', 'text-m');
+    border-radius: 8px
+  }
+
+  &-default {
+    border: 1px solid common.getCssVar('border-color');
+    background-color: common.getCssVar('fill-color', 'blank');
+    &:hover,&:focus{
+      border-color: common.getCssVar('color-primary') ;
+    }
+  }
+  &-warning {
+    border: 1px solid common.getCssVar('border-color');
+    background-color: common.getCssVar('fill-color', 'blank');
+    &:hover,&:focus{
+      border-color: common.getCssVar('color--warning') ;
+    }
+  }
+
+  &-danger {
+    border: 1px solid common.getCssVar('border-color');
+    background-color: common.getCssVar('fill-color', 'blank');
+    &:hover,&:focus{
+      border-color: common.getCssVar('color--danger') ;
+    }
+  }
+  &-success {
+    border: 1px solid common.getCssVar('border-color');
+    background-color: common.getCssVar('fill-color', 'blank');
+    &:hover,&:focus{
+      border-color: common.getCssVar('color-success') ;
+    }
+  }
+
+  &-disabled {
+    border: 1px solid common.getCssVar('border-color');
+    background-color: common.getCssVar('fill-color', 'blank');
+    cursor: not-allowed;
+    &:hover,&:focus{
+      border-color: common.getCssVar('border-color')!important; ;
+    }
+  }
+  &-readonly {
+    border: 1px solid common.getCssVar('border-color');
+    background-color: common.getCssVar('fill-color', 'blank');
+    &:hover,&:focus{
+      border-color: common.getCssVar('border-color')!important ;
+    }
+  }
+
+
+}
