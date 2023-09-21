@@ -1,6 +1,7 @@
 import { Component, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule } from "@angular/common";
 import { CodeBoxComponent } from "../../code-box/code-box.component";
+import { NxAnchorModule } from "ng-yk-design/anchor";
 {{imports}}
 
 @Component({
@@ -10,8 +11,27 @@ import { CodeBoxComponent } from "../../code-box/code-box.component";
   imports: [
    CommonModule,
    CodeBoxComponent,
+   ...NxAnchorModule,
    {{importComponentList}}
   ],
+  styles: [
+  `
+  :host {
+    display: flex;
+    align-items: flex-start;
+  }
+  :host .doc-content {
+    flex: 1;
+  }
+  :host > nx-anchor {
+    display: block;
+    margin-left: 8px;
+    flex: 0 0 200px;
+    position: sticky;
+    top: 24px;
+  }
+  `
+  ]
 })
 export class {{componentName}} {
 

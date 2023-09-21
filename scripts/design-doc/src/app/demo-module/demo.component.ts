@@ -13,7 +13,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
         <li routerLink="/docs/animations/zh" routerLinkActive="router-active"><a >animations</a></li>
       </ul>
     </div>
-    <div class="doc-box">
+    <div class="doc-box" id="component-demo">
       <router-outlet></router-outlet>
     </div>
   `,

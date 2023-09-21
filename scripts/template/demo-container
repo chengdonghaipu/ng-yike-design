@@ -12,7 +12,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 {{navList}}
       </ul>
     </div>
-    <div class="doc-box">
+    <div class="doc-box" id="component-demo">
       <router-outlet></router-outlet>
     </div>
   `,

@@ -1,12 +1,7 @@
 @use "common";
 @use 'var' as *;
 
-$icon-selector: common.component-selector(icon);
-
 @include common.hostBlock($component-namespace) {
-  //margin-right: 6px;
-  //font-size: common.getCssVar("font-size", 'title-m');
-
   display: inline-block;
   color: inherit;
   font-style: normal;

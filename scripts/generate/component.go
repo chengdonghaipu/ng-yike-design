@@ -509,6 +509,11 @@ func wrapperUnionDemo(content []string) string {
 		"<div>\n\t<div>\n\t\t%s\n\t</div>\n</div>", strings.Join(content, "\n"))
 }
 
+func wrapperAnchor(content string, anchor string) string {
+	return fmt.Sprintf(
+		"<div class=\"doc-content\">\n\t\t%s\n</div><nx-anchor container=\"#component-demo\">%s</nx-anchor>", content, anchor)
+}
+
 func wrapperSplitDemo(first, second []string) string {
 	return fmt.Sprintf(
 		"<div>\n\t<div>\n\t\t%s\n\t</div>\n\t<div>\n\t\t%s\n\t</div>\n</div>",
@@ -549,23 +554,27 @@ func (receiver *Component) OutputTemplate(lang string) error {
 	firstApiDoc := receiver.ComponentDocuments[0]
 	var first []string
 	var second []string
+	var anchorLink []string
 
 	demoString := ""
 
 	for i, document := range receiver.DemoDocuments {
 		tempCodeBoxTemplate := codeBoxTemplate
-
+		title := ""
 		if lang == "zh" {
+			title = document.Metadata.Title.ZhCN
 			tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{doc}}", document.ZhCN)
-			tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{title}}", document.Metadata.Title.ZhCN)
+			tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{title}}", title)
 		} else {
+			title = document.Metadata.Title.EnUS
 			tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{doc}}", document.EnUS)
-			tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{title}}", document.Metadata.Title.EnUS)
+			tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{title}}", title)
 		}
 
 		tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{key}}", document.FileKey)
 		tempCodeBoxTemplate = strings.ReplaceAll(tempCodeBoxTemplate, "{{component}}", receiver.Name)
-
+		id := fmt.Sprintf("component-%s-demo-%s", receiver.Name, document.FileKey)
+		anchorLink = append(anchorLink, fmt.Sprintf("<nx-anchor-link href=\"#%s\" title=\"%s\"></nx-anchor-link>", id, title))
 		//document.Metadata.Title
 		if firstApiDoc.Metadata.Cols != 0 {
 			if (i+1)%2 == 0 {
@@ -577,7 +586,7 @@ func (receiver *Component) OutputTemplate(lang string) error {
 			first = append(first, tempCodeBoxTemplate)
 		}
 	}
-
+	anchorLink = append(anchorLink, fmt.Sprintf("<nx-anchor-link href=\"#%s\" title=\"%s\"></nx-anchor-link>", "API", "API"))
 	if len(second) != 0 {
 		demoString = wrapperSplitDemo(first, second)
 	} else {
@@ -612,7 +621,7 @@ func (receiver *Component) OutputTemplate(lang string) error {
 		templateContent += demoString
 		templateContent += wrapperAPI(document.Api)
 
-		templateString += angularNonBindAble(templateContent)
+		templateString += wrapperAnchor(angularNonBindAble(templateContent), strings.Join(anchorLink, "\n"))
 	}
 
 	template = strings.Replace(template, "{{imports}}", strings.Join(importDepComponentList, "\n"), 1)
