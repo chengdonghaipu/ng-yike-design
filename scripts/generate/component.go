@@ -1,6 +1,7 @@
 package generate
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -32,6 +33,7 @@ type Component struct {
 	DemoDocuments      []*util.Document
 	ComponentDocuments []*util.ApiDocument
 	DemoMetas          []*DemoMeta
+	MdDemoMetas        []*util.DemoMeta
 }
 
 func NewComponent(name, docDir, componentDir string) *Component {
@@ -42,13 +44,47 @@ func NewComponent(name, docDir, componentDir string) *Component {
 	if err != nil {
 		log.Fatal(err)
 	}
+	demoDir := path.Join(componentDir, "demo")
+	files, err := ioutil.ReadDir(demoDir)
+	var demoMetas []*DemoMeta
+	var mdDemoMeta []*util.DemoMeta
+	if err != nil {
+		log.Println("Error:", err)
+	}
+
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		filename := file.Name()
+		if !strings.HasSuffix(filename, ".ts") {
+			continue
+		}
+
+		demoMeta := &DemoMeta{
+			Name:     strings.Replace(filename, ".ts", "", 1),
+			Filename: filename,
+			FilePath: filepath.Join(demoDir, filename),
+		}
+
+		mdDemoMeta = append(mdDemoMeta, &util.DemoMeta{
+			ComponentName: name,
+			Filename:      demoMeta.Name,
+			FilePath:      demoMeta.FilePath,
+		})
+
+		demoMetas = append(demoMetas, demoMeta)
+	}
 
 	return &Component{
 		Name:            name,
 		DocDir:          docDir,
 		OutputDir:       outputDir,
 		ComponentDir:    componentDir,
-		DemoDir:         path.Join(componentDir, "demo"),
+		DemoDir:         demoDir,
+		DemoMetas:       demoMetas,
+		MdDemoMetas:     mdDemoMeta,
 		ComponentDocDir: path.Join(componentDir, "doc"),
 		TemplatePath:    path.Join("template", "demo-component"),
 	}
@@ -126,6 +162,43 @@ func (receiver *Component) getApiComponentByLang(lang string) *util.ApiDocument 
 		}
 
 		return componentDocument
+	}
+
+	return nil
+}
+
+func clearDemoCode(docDir string) error {
+	assetsDir := path.Join(docDir, "src", "assets", "demo-codes")
+	return util.RemoveFilesInDirParallel(assetsDir)
+}
+
+func compileDemoCode(components []*Component) error {
+	if len(components) == 0 {
+		return nil
+	}
+
+	docDir := components[0].DocDir
+
+	assetsDir := path.Join(docDir, "src", "assets", "demo-codes")
+
+	err := os.MkdirAll(assetsDir, os.ModePerm)
+	if err != nil {
+		fmt.Println("err", err)
+		return err
+	}
+
+	for _, component := range components {
+		for _, document := range component.ComponentDocuments {
+			for name, code := range document.HighlightCode {
+				outputPath := path.Join(fmt.Sprintf("%s.json", path.Join(assetsDir, name)))
+				codeStr, err := json.Marshal(code)
+
+				if err != nil {
+					continue
+				}
+				_ = util.WriteFile(outputPath, string(codeStr))
+			}
+		}
 	}
 
 	return nil
@@ -289,9 +362,23 @@ func CompileDemoDocs(docDir string, components []*Component) error {
 		return compileDemoDocLayout(docDir, components, "zh")
 	})
 
+	// 清除高亮代码缓存
+	clearDemoCodeTask := flows.NewTask("清除DEMO缓存", func() error {
+		return clearDemoCode(docDir)
+	})
+
+	// 生成高亮代码 没有执行顺序要求
+	compileDemoCodeTask := flows.NewAutoNameTask(func() error {
+		return compileDemoCode(components)
+	})
+
+	compileDemoCodeTask.SetDependency(clearDemoCodeTask)
+
 	flows.ParallelTask([]*flows.Task{
+		clearDemoCodeTask,
 		compileDemoRouteTask,
 		compileDemoDocLayoutTask,
+		compileDemoCodeTask,
 	})
 
 	return nil
@@ -299,39 +386,16 @@ func CompileDemoDocs(docDir string, components []*Component) error {
 
 func (receiver *Component) CollectComponents() error {
 	componentDir := receiver.DemoDir
-	files, err := ioutil.ReadDir(componentDir)
 
-	if err != nil {
-		log.Println("Error:", err)
-		return err
-	}
 	var wg sync.WaitGroup
 
-	for _, file := range files {
-		if file.IsDir() {
-			continue
-		}
-
-		filename := file.Name()
-		// && !strings.HasSuffix(filename, ".md")
-		if !strings.HasSuffix(filename, ".ts") {
-			continue
-		}
-
-		demoMeta := &DemoMeta{
-			Name:     strings.Replace(filename, ".ts", "", 1),
-			Filename: filename,
-			FilePath: filepath.Join(componentDir, filename),
-		}
-
-		receiver.DemoMetas = append(receiver.DemoMetas, demoMeta)
-
+	for _, meta := range receiver.DemoMetas {
 		wg.Add(1)
 
-		go func(filePath string) {
+		go func(meta *DemoMeta) {
 			defer wg.Done()
-			receiver.CollectComponent(componentDir, filename)
-		}(demoMeta.FilePath)
+			receiver.CollectComponent(componentDir, meta.Filename)
+		}(meta)
 	}
 
 	wg.Add(1)
@@ -379,7 +443,7 @@ func (receiver *Component) CollectComponent(demoDir, filename string) {
 }
 
 func (receiver *Component) resolveApiMdByPath(mdFilePath string) (addFlag bool) {
-	document, err := util.ParseApiDocument(mdFilePath)
+	document, err := util.ParseApiDocument(mdFilePath, receiver.MdDemoMetas)
 	addFlag = false
 
 	if err != nil {
@@ -425,7 +489,7 @@ func (receiver *Component) resolveApiMd(wg *sync.WaitGroup) {
 		}
 
 		mdFilePath := path.Join(componentDocDir, filename)
-		document, err := util.ParseApiDocument(mdFilePath)
+		document, err := util.ParseApiDocument(mdFilePath, receiver.MdDemoMetas)
 
 		if err != nil {
 			log.Fatal("Error parsing markdown:", err)

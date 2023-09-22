@@ -40,15 +40,39 @@ type ApiDocMetadata struct {
 }
 
 type ApiDocument struct {
-	Metadata    ApiDocMetadata
-	Use         string // 何时使用章节的所有内容 并转换成HTML
-	Api         string // Api章节的所有内容 并转换为HTML
-	Language    string // 默认 zhCN 根据文件名称来定的
-	Description string // 组件描述 也就是这部分“按钮用于开始一个即时操作。” 并转换为HTML
-	FilePath    string
+	Metadata      ApiDocMetadata
+	Use           string // 何时使用章节的所有内容 并转换成HTML
+	Api           string // Api章节的所有内容 并转换为HTML
+	Language      string // 默认 zhCN 根据文件名称来定的
+	Description   string // 组件描述 也就是这部分“按钮用于开始一个即时操作。” 并转换为HTML
+	FilePath      string
+	HighlightCode map[string]map[string]string
 }
 
-func ParseApiDocument(filePath string) (*ApiDocument, error) {
+type DemoMeta struct {
+	ComponentName string
+	Filename      string
+	FilePath      string
+}
+
+func (receiver *DemoMeta) GetJsonFileName() string {
+	return fmt.Sprintf("%s-demo-%s", receiver.ComponentName, receiver.Filename)
+}
+
+func ParseApiDocument(filePath string, demoMetas []*DemoMeta) (*ApiDocument, error) {
+	highlightCodeMap := map[string]map[string]string{}
+	for _, meta := range demoMetas {
+		content, err := ioutil.ReadFile(meta.FilePath)
+		if err != nil {
+			continue
+		}
+		mdContent := fmt.Sprintf("```ts\n%s\n```", string(content))
+		htmlContent := convertToHTML(mdContent)
+		highlightCodeMap[meta.GetJsonFileName()] = map[string]string{
+			"code": htmlContent,
+		}
+	}
+
 	mdContent, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
@@ -74,6 +98,7 @@ func ParseApiDocument(filePath string) (*ApiDocument, error) {
 	apiDoc.Language = strings.TrimSuffix(fileNameWithExt, filepath.Ext(fileNameWithExt))
 	apiDoc.Metadata = metadata
 	apiDoc.FilePath = filePath
+	apiDoc.HighlightCode = highlightCodeMap
 
 	languageToTitle := map[string]map[string]string{
 		"zh-CN": {
