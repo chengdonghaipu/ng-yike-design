@@ -1,10 +1,13 @@
-import {Component, Input} from '@angular/core';
-import { NgClass } from '@angular/common';
+import {Component, computed, inject, Input, signal} from '@angular/core';
+import {NgClass, NgIf} from '@angular/common';
+import {HttpClient} from "@angular/common/http";
+import {Observable} from "rxjs";
+import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-code-box',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, NgIf],
   template: `
     <section class="code-box" [ngClass]="{ expand: nxExpanded }" [attr.id]="nxId">
       <section class="code-box-demo">
@@ -40,6 +43,8 @@ import { NgClass } from '@angular/common';
             />
           </span>
         </div>
+      </section>
+      <section class="code-content" [innerHTML]="safeCode()" *ngIf="nxExpanded">
       </section>
     </section>
   `,
@@ -131,12 +136,26 @@ export class CodeBoxComponent {
   @Input() nxId!: string;
   @Input() nxTitle!: string;
   @Input() nxExpanded = false;
+  httpClient = inject(HttpClient);
+  domSanitizer = inject(DomSanitizer);
+  codeContent = signal('')
+  safeCode = computed(() => {
+    const code = this.codeContent();
+    return this.domSanitizer.bypassSecurityTrustHtml(code);
+  })
 
   expandCode(expanded: boolean): void {
     this.nxExpanded = expanded;
     if (expanded) {
-      // this.getDemoCode().subscribe();
+      this.getDemoCode().subscribe(value => {
+        console.log(value);
+        this.codeContent.set(value.code)
+      });
     }
+  }
+
+  getDemoCode(): Observable<{ code: string }> {
+    return this.httpClient.get<{ code: string }>(`assets/demo-codes/${this.nxId.replace(/^component-/, '')}.json`, { responseType: "json" })
   }
 
   copyCode(): void {
