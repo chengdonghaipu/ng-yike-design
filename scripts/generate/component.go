@@ -452,7 +452,7 @@ func (receiver *Component) resolveApiMdByPath(mdFilePath string) (addFlag bool) 
 	}
 
 	index := util.NewSliceHelper(receiver.ComponentDocuments).FindIndex(func(document *util.ApiDocument) bool {
-		return document.FilePath == mdFilePath
+		return strings.Replace(document.FilePath, "\\", "/", -1) == strings.Replace(mdFilePath, "\\", "/", -1)
 	})
 
 	if index < 0 {
