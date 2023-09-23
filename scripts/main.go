@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"ng-yike-design/script/cmd"
+	"ng-yike-design/script/util"
 	"os"
 	osExec "os/exec"
 	"path"
@@ -57,6 +58,8 @@ func main() {
 	go startNodeServe(ready)
 	<-ready
 	// 我想确保startNodeServe已经启动成功了才往下执行
+	code := "const a = 0"
+	util.GetNodeServeClient().Highlight(code, "angular")
 	err := cmd.Execute()
 	if err != nil {
 		fmt.Println(err)

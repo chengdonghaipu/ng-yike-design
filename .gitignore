@@ -45,3 +45,5 @@ Thumbs.db
 /projects/design-doc/
 /projects/junit/
 /projects/coverage-report/
+/scripts/**/node_modules/
+/scripts/node-shell/.node-shell

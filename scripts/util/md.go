@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"fmt"
+	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
 	"github.com/go-yaml/yaml"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
@@ -242,9 +243,14 @@ func convertToHTML(markdownContent string) string {
 	var htmlOutput bytes.Buffer
 
 	md := goldmark.New(
-		goldmark.WithExtensions(extension.GFM),
+		goldmark.WithExtensions(extension.GFM), // github.xml
 		goldmark.WithExtensions(
-			highlighting.Highlighting,
+			highlighting.NewHighlighting(
+				highlighting.WithStyle("github"),
+				highlighting.WithFormatOptions(
+					chromahtml.WithClasses(true),
+				),
+			),
 		),
 		goldmark.WithRenderer(HtmlRenderer()),
 		goldmark.WithRendererOptions(html.WithUnsafe()),
