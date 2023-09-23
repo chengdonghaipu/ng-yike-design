@@ -118,8 +118,10 @@ func (receiver *Component) UpdateApiDocByPath(mdPath string) {
 }
 
 func (receiver *Component) UpdateDocByPath(mdPath string) {
+	// 获取文件的名称（不包括后缀名）
+	fileName := strings.TrimSuffix(filepath.Base(mdPath), filepath.Ext(mdPath))
 	demoMeta := util.NewSliceHelper(receiver.DemoMetas).Find(func(meta *DemoMeta) bool {
-		return strings.Contains(filepath.Base(mdPath), meta.Filename)
+		return fileName == meta.Name
 	})
 
 	if demoMeta == nil {
