@@ -19,9 +19,9 @@ Prism.languages.insertBefore('angular', 'string', {
     pattern: /styles[\s]*:[\s]*\[[\s]*`(?:\\[\s\S]|[^\\`])*`[\s]*\]/,
     greedy : true,
     inside : {
-      'css': {
+      'less': {
         pattern: /`(?:\\[\s\S]|[^\\`])*`/,
-        inside : Prism.languages.css
+        inside : Prism.languages.less
       }
     }
   }

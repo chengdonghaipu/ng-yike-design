@@ -1,7 +1,7 @@
 import {Component, computed, inject, Input, signal} from '@angular/core';
 import {NgClass, NgIf} from '@angular/common';
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {finalize, Observable} from "rxjs";
 import {DomSanitizer} from "@angular/platform-browser";
 import {NxSpaceComponent} from "ng-yk-design/space";
 import {NxIconComponent} from "ng-yk-design/icon";
@@ -14,7 +14,7 @@ import {NxButtonComponent} from "ng-yk-design/button";
   template: `
     <section class="code-box" [ngClass]="{ expand: nxExpanded }" [attr.id]="nxId">
       <h3 class="code-box-title">{{ nxTitle }} <a href="#{{nxId}}">#</a></h3>
-      <div class="code-box-description">
+      <div class="code-box-description markdown">
         <ng-content select="[intro]"></ng-content>
       </div>
       <section class="code-box-demo">
@@ -24,9 +24,9 @@ import {NxButtonComponent} from "ng-yk-design/button";
       </section>
       <section class="code-box-meta" nx-space block justify="end">
         <button nx-button nxShape="square" nxType="outline">
-          <nx-icon icon="copy" type="outline" size="20px"></nx-icon>
+          <nx-icon icon="copy" type="outline" size="20px" ></nx-icon>
         </button>
-        <button nx-button nxShape="square" [class.select]="nxExpanded" (click)="expandCode(!nxExpanded)">
+        <button nx-button nxShape="square" nxType="outline" [class.select]="nxExpanded" (click)="expandCode(!nxExpanded)">
           <nx-icon icon="code" type="outline" size="20px"></nx-icon>
         </button>
         <!--<div class="code-box-title">
@@ -58,6 +58,7 @@ import {NxButtonComponent} from "ng-yk-design/button";
         </div>-->
       </section>
       <section class="code-content" [innerHTML]="safeCode()" *ngIf="nxExpanded">
+        loading...
       </section>
     </section>
   `,
@@ -180,12 +181,10 @@ export class CodeBoxComponent {
     const code = this.codeContent();
     return this.domSanitizer.bypassSecurityTrustHtml(code);
   })
-
   expandCode(expanded: boolean): void {
     this.nxExpanded = expanded;
-    if (expanded) {
+    if (expanded && !this.codeContent()) {
       this.getDemoCode().subscribe(value => {
-        console.log(value);
         this.codeContent.set(value.code)
       });
     }
