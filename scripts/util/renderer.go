@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/alecthomas/chroma/quick"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
@@ -91,13 +92,17 @@ func ExtractCodeFromHTML(htmlString string) ([]string, error) {
 func (r *CustomHTMLRenderer) kindFencedCodeBlock(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	n := node.(*ast.FencedCodeBlock)
 	if entering {
-		_, _ = w.WriteString("<pre><code")
 		language := n.Language(source)
 		if language != nil {
-			_, _ = w.WriteString(" class=\"language-")
-			r.Writer.Write(w, language)
-			_, _ = w.WriteString("\"")
+			_, _ = w.WriteString(fmt.Sprintf("<pre class=\"language-%s\"><code", language))
+		} else {
+			_, _ = w.WriteString("<pre><code")
 		}
+		//if language != nil {
+		//	_, _ = w.WriteString(" class=\"language-")
+		//	r.Writer.Write(w, language)
+		//	_, _ = w.WriteString("\"")
+		//}
 		_ = w.WriteByte('>')
 
 		code := ""
@@ -107,10 +112,10 @@ func (r *CustomHTMLRenderer) kindFencedCodeBlock(w util.BufWriter, source []byte
 			code += string(line.Value(source))
 			//r.Writer.RawWrite(w, line.Value(source))
 		}
-		highlightedCode, _ := highlightCode(code, string(language))
-		codeContents, _ := ExtractCodeFromHTML(highlightedCode)
+		highlightedCode := GetNodeServeClient().Highlight(code, string(language), "-original")
+		//codeContents, _ := ExtractCodeFromHTML(highlightedCode)
 		//fmt.Println(codeContents)
-		_, _ = w.WriteString(codeContents[0])
+		_, _ = w.WriteString(highlightedCode)
 	} else {
 		_, _ = w.WriteString("</code></pre>\n")
 	}
@@ -120,5 +125,5 @@ func (r *CustomHTMLRenderer) kindFencedCodeBlock(w util.BufWriter, source []byte
 func (r *CustomHTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	r.Renderer.RegisterFuncs(reg)
 	reg.Register(ast.KindHeading, r.renderHeading)
-	//reg.Register(ast.KindFencedCodeBlock, r.kindFencedCodeBlock)
+	reg.Register(ast.KindFencedCodeBlock, r.kindFencedCodeBlock)
 }

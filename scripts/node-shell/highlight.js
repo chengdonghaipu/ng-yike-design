@@ -27,7 +27,29 @@ Prism.languages.insertBefore('angular', 'string', {
   }
 });
 
-exports.highlight = (code, lang) => {
+exports.highlightOriginal = (code, lang) => {
   const language = Prism.languages[lang] || Prism.languages.autoit;
   return Prism.highlight(code, language)
+}
+
+exports.highlight = (code, lang) => {
+  const language = Prism.languages[lang] || Prism.languages.autoit;
+  const out = Prism.highlight(code, language)
+
+  if (out == null) {
+    return out
+  } else if (!lang) {
+    code = out;
+    return '<pre><code>' + (true ? code : escape(code, true)) + '</code></pre>';
+  }
+  code = out;
+  return (
+    '<pre class="' +
+    'language-' +
+    escape(lang, true) +
+    '">' +
+    '<code>' +
+    (true ? code : escape(code, true)) +
+    '</code></pre>\n'
+  );
 }

@@ -104,7 +104,8 @@
             ],
             "styles": [
               "projects/design-doc/src/styles.scss",
-              "projects/design-doc/src/styles.less"
+              "projects/design-doc/src/styles.less",
+              "projects/design-doc/src/assets/prism.min.css"
             ],
             "scripts": [],
             "serviceWorker": true,

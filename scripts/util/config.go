@@ -40,8 +40,8 @@ func withQueryParamsToUrl(reqUrl string, value map[string]string) string {
 	return u.String()
 }
 
-func (receiver *NodeServeClient) Highlight(code, lang string) {
-	reqUrl := fmt.Sprintf("%s/highlight", receiver.httpRootUrl())
+func (receiver *NodeServeClient) Highlight(code, lang, api string) string {
+	reqUrl := fmt.Sprintf("%s/highlight%s", receiver.httpRootUrl(), api)
 
 	body := map[string]interface{}{
 		"code": code,
@@ -51,13 +51,13 @@ func (receiver *NodeServeClient) Highlight(code, lang string) {
 	jsonData, err := json.Marshal(body)
 	if err != nil {
 		fmt.Println("转换为JSON出错:", err)
-		return
+		return ""
 	}
 
 	resp, err := http.Post(reqUrl, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		fmt.Println("HTTP请求错误:", err)
-		return
+		return ""
 	}
 	defer resp.Body.Close()
 
@@ -65,11 +65,10 @@ func (receiver *NodeServeClient) Highlight(code, lang string) {
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("读取响应内容错误:", err)
-		return
+		return ""
 	}
 
-	// 打印响应内容
-	fmt.Printf("响应内容: %s\n", string(respBody))
+	return string(respBody)
 }
 
 func GetNodeServeClient() *NodeServeClient {

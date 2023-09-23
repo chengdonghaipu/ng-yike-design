@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"ng-yike-design/script/cmd"
-	"ng-yike-design/script/util"
 	"os"
 	osExec "os/exec"
 	"path"
@@ -41,7 +40,7 @@ func startNodeServe(ready chan<- struct{}) {
 
 			if strings.Contains(output, "Server is running") {
 				ready <- struct{}{} // 发送通知，Node.js服务器已成功启动
-				break
+				continue
 			}
 		}
 	}()
@@ -57,9 +56,6 @@ func main() {
 	ready := make(chan struct{})
 	go startNodeServe(ready)
 	<-ready
-	// 我想确保startNodeServe已经启动成功了才往下执行
-	code := "const a = 0"
-	util.GetNodeServeClient().Highlight(code, "angular")
 	err := cmd.Execute()
 	if err != nil {
 		fmt.Println(err)

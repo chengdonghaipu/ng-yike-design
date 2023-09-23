@@ -1,6 +1,6 @@
 const http = require('http');
 const {writeFile} = require('fs/promises');
-const {highlight} = require("./highlight");
+const {highlight, highlightOriginal} = require("./highlight");
 
 const server = http.createServer((req, res) => {
   if (req.url === '/highlight' && req.method === 'POST') {
@@ -13,9 +13,23 @@ const server = http.createServer((req, res) => {
     })
 
     req.on('end', () => {
-      console.log('Received request body:', requestBody);
+      // console.log('Received request body:', requestBody);
       const { code, lang } = JSON.parse(requestBody);
       res.end(highlight(code, lang));
+    });
+  } else if (req.url === '/highlight-original' && req.method === 'POST') {
+    let requestBody = '';
+
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+
+    req.on('data', chunk => {
+      requestBody += chunk
+    })
+
+    req.on('end', () => {
+      // console.log('Received request body:', requestBody);
+      const { code, lang } = JSON.parse(requestBody);
+      res.end(highlightOriginal(code, lang));
     });
   } else {
     res.writeHead(404, {'Content-Type': 'text/plain'});

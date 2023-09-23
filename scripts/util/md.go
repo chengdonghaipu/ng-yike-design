@@ -3,7 +3,6 @@ package util
 import (
 	"bytes"
 	"fmt"
-	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
 	"github.com/go-yaml/yaml"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
@@ -67,8 +66,7 @@ func ParseApiDocument(filePath string, demoMetas []*DemoMeta) (*ApiDocument, err
 		if err != nil {
 			continue
 		}
-		mdContent := fmt.Sprintf("```ts\n%s\n```", string(content))
-		htmlContent := convertToHTML(mdContent)
+		htmlContent := GetNodeServeClient().Highlight(string(content), "angular", "")
 		highlightCodeMap[meta.GetJsonFileName()] = map[string]string{
 			"code": htmlContent,
 		}
@@ -244,14 +242,14 @@ func convertToHTML(markdownContent string) string {
 
 	md := goldmark.New(
 		goldmark.WithExtensions(extension.GFM), // github.xml
-		goldmark.WithExtensions(
-			highlighting.NewHighlighting(
-				highlighting.WithStyle("github"),
-				highlighting.WithFormatOptions(
-					chromahtml.WithClasses(true),
-				),
-			),
-		),
+		//goldmark.WithExtensions(
+		//	highlighting.NewHighlighting(
+		//		highlighting.WithStyle("github"),
+		//		highlighting.WithFormatOptions(
+		//			chromahtml.WithClasses(true),
+		//		),
+		//	),
+		//),
 		goldmark.WithRenderer(HtmlRenderer()),
 		goldmark.WithRendererOptions(html.WithUnsafe()),
 	)
