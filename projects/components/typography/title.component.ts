@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   effect,
   Input,
   numberAttribute,
@@ -17,6 +16,8 @@ import {
 
 import { onChanges, useHostDom } from 'ng-yk-design/core';
 import { watchInputs } from 'ng-yk-design/core/util';
+
+import { TypeInput, withTypeInput } from './with-type';
 
 interface NxSpaceTitleInputs {
   level?: 1 | 2 | 3 | 4 | 5 | '1' | '2' | '3' | '4' | '5';
@@ -59,9 +60,11 @@ function withTitleInputs<T extends NxSpaceTitleInputs>(this: T): void {
     class: 'yk-typography-title'
   }
 })
-export class NxTitleComponent implements NxSpaceTitleInputs {
+export class NxTitleComponent implements NxSpaceTitleInputs, TypeInput {
   @Input({ transform: numberAttribute }) level?: NxSpaceTitleInputs['level'];
+  @Input() type?: TypeInput['type'];
   constructor() {
     withTitleInputs.call(this);
+    withTypeInput.call(this);
   }
 }

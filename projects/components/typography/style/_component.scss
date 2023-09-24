@@ -35,3 +35,8 @@ h5.#{$host-selector}, .#{common.with-suffix($host-selector, 5)} {
   margin-bottom: 0.5em;
   font-weight: 600;
 }
+
+@include common.hostBlock($text-namespace) {
+  font-size: common.getCssVar('font-size', 'text-m');
+  line-height: 1.57;
+}

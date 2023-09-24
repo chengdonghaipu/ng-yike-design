@@ -137,7 +137,7 @@ import {NxButtonComponent} from "ng-yk-design/button";
       line-height: 1.4;
       margin-top: 1em;
       margin-bottom: 0.5em;
-      font-weight: 500;
+      font-weight: 600;
       > a {
         opacity: 0;
         //transition: none;
