@@ -1,13 +1,13 @@
 ---
 category: Components
 type: 通用
-title: Icon
-subtitle: 图标
+title: typography
+subtitle: 排版
 ---
 
 ## 组件描述
 
-矢量图形。
+用户展示段落、标题、文本内容
 
 ## 何时使用
 
