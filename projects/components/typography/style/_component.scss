@@ -1,13 +1,37 @@
 @use "common";
 @use 'var' as *;
+@use 'mixin' as *;
 
-@include common.hostBlock($component-namespace) {
-  display: inline-block;
-  color: inherit;
-  font-style: normal;
-  line-height: 0;
-  text-align: center;
-  text-transform: none;
-  vertical-align: -0.125em;
-  text-rendering: optimizelegibility;
+
+$host-selector: common.component-selector($title-namespace);
+
+h1.#{$host-selector}, .#{common.with-suffix($host-selector, 1)} {
+  font-size: common.getCssVar('font-size', 'title-xl');
+  line-height: 1.24;
+}
+
+h2.#{$host-selector}, .#{common.with-suffix($host-selector, 2)} {
+  font-size: common.getCssVar('font-size', 'title-l');
+  line-height: 1.28;
+}
+
+h3.#{$host-selector}, .#{common.with-suffix($host-selector, 3)} {
+  font-size: common.getCssVar('font-size', 'title-m');
+  line-height: 1.34;
+}
+
+h4.#{$host-selector}, .#{common.with-suffix($host-selector, 4)} {
+  font-size: common.getCssVar('font-size', 'title-s');
+  line-height: 1.4;
+}
+
+h5.#{$host-selector}, .#{common.with-suffix($host-selector, 5)} {
+  font-size: common.getCssVar('font-size', 'text-l');
+  line-height: 1.5;
+}
+
+@include common.hostBlock($title-namespace) {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
 }

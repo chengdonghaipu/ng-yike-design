@@ -68,9 +68,10 @@ $font-family: map.merge(('': "'PingFang SC', 'Helvetica Neue', Helvetica, 'Hirag
 
 $font-size: (
   ) !default;
-$font-size: map.merge(('title-l': 32px,
+$font-size: map.merge(('title-xl': 40px,
+        'title-l': 32px,
       'title-m': 24px,
-      'title-s': 28px,
+      'title-s': 18px,
       'text-l': 16px,
       'text-m': 14px,
       'text-s': 12px,

@@ -25,6 +25,10 @@ export interface HostDom {
 
   removeClass(name: string): void;
 
+  removePrefixClass(prefix: string): void;
+
+  removeSuffixClass(suffix: string): void;
+
   hasClass(name: string): boolean;
 }
 
@@ -57,6 +61,26 @@ export function useHostDom(): HostDom {
     renderer.removeClass(element(), name);
   }
 
+  function removePrefixClass(prefix: string): void {
+    element()?.classList.forEach(item => {
+      if (!item.startsWith(prefix)) {
+        return;
+      }
+
+      renderer.removeClass(element(), item);
+    });
+  }
+
+  function removeSuffixClass(suffix: string): void {
+    element()?.classList.forEach(item => {
+      if (!item.endsWith(suffix)) {
+        return;
+      }
+
+      renderer.removeClass(element(), item);
+    });
+  }
+
   function hasClass(name: string): boolean {
     return element()?.classList.contains(name);
   }
@@ -69,6 +93,8 @@ export function useHostDom(): HostDom {
     addClass,
     hasClass,
     removeClass,
+    removePrefixClass,
+    removeSuffixClass,
     renderer,
     elementRef,
     element

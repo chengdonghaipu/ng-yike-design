@@ -1,5 +1,6 @@
 @use 'sass:map';
 @use "common";
 
-$title-namespace: title;
-$text-namespace: text;
+$component-namespace: typography;
+$title-namespace: $component-namespace + -title;
+$text-namespace: $component-namespace + -text;

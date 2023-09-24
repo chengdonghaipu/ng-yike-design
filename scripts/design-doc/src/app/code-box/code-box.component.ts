@@ -72,7 +72,7 @@ import {NxButtonComponent} from "ng-yk-design/button";
       transition: opacity .3s;
     }
     .code-box {
-      margin-top: 28px;
+      //margin-top: 28px;
       max-width: 1200px;
       //background-color: #fff;
       //position: relative;
@@ -133,11 +133,11 @@ import {NxButtonComponent} from "ng-yk-design/button";
     }
 
     .code-box-title {
-      font-size: 24px;
-      line-height: 1.34;
+      font-size: 18px;
+      line-height: 1.4;
       margin-top: 1em;
       margin-bottom: 0.5em;
-      font-weight: 600;
+      font-weight: 500;
       > a {
         opacity: 0;
         //transition: none;

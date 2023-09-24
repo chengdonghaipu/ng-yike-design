@@ -6,6 +6,6 @@
 import { NxTextComponent } from './text.component';
 import { NxTitleComponent } from './title.component';
 
-export const NxTypographyModule = [NxTextComponent, NxTitleComponent];
+const NxTypographyModule = [NxTextComponent, NxTitleComponent];
 
-export { NxTextComponent, NxTitleComponent };
+export { NxTextComponent, NxTitleComponent, NxTypographyModule };

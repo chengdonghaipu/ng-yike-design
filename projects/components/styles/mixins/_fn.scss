@@ -23,3 +23,7 @@
 @function component-selector($host-name) {
   @return gf.$namespace + '-' + $host-name;
 }
+
+@function with-suffix($selector, $suffix) {
+  @return $selector + '-' + $suffix;
+}
