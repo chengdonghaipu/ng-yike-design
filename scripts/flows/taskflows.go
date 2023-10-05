@@ -94,12 +94,14 @@ func (t *Task) WaitForCompletion() {
 	}
 }
 
+// SerialTask 串行任务
 func SerialTask(tasks []*Task) {
 	for _, task := range tasks {
 		task.Run()
 	}
 }
 
+// ParallelTask 并行任务
 func ParallelTask(tasks []*Task) {
 	var wg sync.WaitGroup
 

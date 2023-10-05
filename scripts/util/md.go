@@ -240,7 +240,7 @@ func convertToHTML(markdownContent string) string {
 	var htmlOutput bytes.Buffer
 
 	md := goldmark.New(
-		goldmark.WithExtensions(extension.GFM), // github.xml
+		goldmark.WithExtensions(extension.GFM),
 		//goldmark.WithExtensions(
 		//	highlighting.NewHighlighting(
 		//		highlighting.WithStyle("github"),
