@@ -78,7 +78,7 @@ function withTextUiInputs<T extends TextUiInputs>(this: T): void {
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'yk-typography-text'
+    class: 'yk-typography yk-typography-text'
   }
 })
 export class NxTextComponent implements TypeInput, TextUiInputs {

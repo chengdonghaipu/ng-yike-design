@@ -57,7 +57,7 @@ function withTitleInputs<T extends NxSpaceTitleInputs>(this: T): void {
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'yk-typography-title'
+    class: 'yk-typography yk-typography-title'
   }
 })
 export class NxTitleComponent implements NxSpaceTitleInputs, TypeInput {

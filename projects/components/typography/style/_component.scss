@@ -40,3 +40,10 @@ h5.#{$host-selector}, .#{common.with-suffix($host-selector, 5)} {
   font-size: common.getCssVar('font-size', 'text-m');
   line-height: 1.57;
 }
+
+
+@include common.hostBlock($paragraph-namespace) {
+  position: relative;
+  margin-bottom: 1em;
+}
+
